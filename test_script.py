@@ -52,10 +52,10 @@ def handle_ipc(conn):
 
 
 def start_ipc_server():
-    if os.path.exists("/tmp/input_module_socket"):
-        os.remove("/tmp/input_module_socket")
+    if os.path.exists("/tmp/prd_watch_socket"):
+        os.remove("/tmp/prd_watch_socket")
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    server.bind("/tmp/input_module_socket")
+    server.bind("/tmp/prd_watch_socket")
     server.listen(1)
     conn, addr = server.accept()
     handle_ipc(conn)

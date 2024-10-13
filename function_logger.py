@@ -4,7 +4,7 @@ import socket
 def inject_logging(function_name):
     client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
-        client.connect("/tmp/input_module_socket")
+        client.connect("/tmp/prd_watch_socket")
         client.send(f"INJECT:{function_name}".encode())
         response = client.recv(1024).decode()
         print(f"Received response: {response}")

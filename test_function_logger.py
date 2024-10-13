@@ -17,7 +17,7 @@ def test_inject_logging_success(mock_socket):
     with patch("builtins.print") as mock_print:
         function_logger.inject_logging("test_function")
 
-    mock_client.connect.assert_called_once_with("/tmp/input_module_socket")
+    mock_client.connect.assert_called_once_with("/tmp/prd_watch_socket")
     mock_client.send.assert_called_once_with(b"INJECT:test_function")
     mock_client.recv.assert_called_once_with(1024)
     mock_client.close.assert_called_once()
@@ -32,7 +32,7 @@ def test_inject_logging_function_not_found(mock_socket):
     with patch("builtins.print") as mock_print:
         function_logger.inject_logging("nonexistent_function")
 
-    mock_client.connect.assert_called_once_with("/tmp/input_module_socket")
+    mock_client.connect.assert_called_once_with("/tmp/prd_watch_socket")
     mock_client.send.assert_called_once_with(b"INJECT:nonexistent_function")
     mock_client.recv.assert_called_once_with(1024)
     mock_client.close.assert_called_once()
@@ -47,7 +47,7 @@ def test_inject_logging_connection_error(mock_socket):
     with patch("builtins.print") as mock_print:
         function_logger.inject_logging("test_function")
 
-    mock_client.connect.assert_called_once_with("/tmp/input_module_socket")
+    mock_client.connect.assert_called_once_with("/tmp/prd_watch_socket")
     mock_client.send.assert_not_called()
     mock_client.recv.assert_not_called()
     mock_client.close.assert_called_once()
