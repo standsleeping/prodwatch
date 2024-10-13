@@ -1,13 +1,6 @@
-import pytest
 from unittest.mock import patch, MagicMock
 import test_script
 import os
-
-
-@pytest.fixture
-def mock_socket():
-    with patch("input_module.socket.socket") as mock:
-        yield mock
 
 
 def test_get_user_input(monkeypatch):
@@ -50,7 +43,7 @@ def test_handle_ipc_inject(tmp_path):
         )
 
 
-def test_handle_ipc_inject_nonexistent_function(tmp_path):
+def test_handle_ipc_inject_nonexistent_function():
     mock_conn = MagicMock()
     mock_conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
 
