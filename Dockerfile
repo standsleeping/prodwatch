@@ -12,8 +12,8 @@ WORKDIR /app
 RUN touch /app/log_file.txt && \
     chmod 666 /app/log_file.txt
 
-COPY input_module.py function_logger.py ./
+COPY test_script.py function_logger.py ./
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python3", "input_module.py"]
+CMD ["python3", "test_script.py"]
