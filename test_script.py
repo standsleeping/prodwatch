@@ -2,6 +2,7 @@ import os
 import socket
 import threading
 import inspect
+from prodwatch.handle_ipc import handle_ipc, add_project_to_path, import_user_modules
 
 
 def get_user_input():
@@ -16,41 +17,6 @@ def calculate_sum(a, b):
     return result
 
 
-def handle_ipc(conn):
-    while True:
-        data = conn.recv(1024).decode().split(":")
-        command = data[0]
-
-        if command == "INJECT":
-            function_name = data[1]
-            if function_name in globals() and callable(globals()[function_name]):
-                original_function = globals()[function_name]
-
-                def logged_function(*args, **kwargs):
-                    result = original_function(*args, **kwargs)
-                    try:
-                        with open(
-                            os.environ.get("APP_LOG_FILE", "/app/log_file.txt"), "a"
-                        ) as f:
-                            f.write(
-                                f"Function {function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
-                            )
-                        print(f"Logged {function_name} call")
-                    except Exception as e:
-                        print(f"Error writing to log file: {e}")
-                    return result
-
-                globals()[function_name] = logged_function
-                conn.send("SUCCESS".encode())
-            else:
-                conn.send("FUNCTION_NOT_FOUND".encode())
-
-        elif command == "STOP":
-            break
-
-    conn.close()
-
-
 def start_ipc_server():
     if os.path.exists("/tmp/prd_watch_socket"):
         os.remove("/tmp/prd_watch_socket")
@@ -63,6 +29,9 @@ def start_ipc_server():
 
 
 if __name__ == "__main__":
+    add_project_to_path()
+    import_user_modules()
+
     print(f"Input module is running (PID: {os.getpid()}).")
 
     ipc_thread = threading.Thread(target=start_ipc_server)

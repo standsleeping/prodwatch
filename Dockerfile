@@ -13,6 +13,7 @@ RUN touch /app/log_file.txt && \
     chmod 666 /app/log_file.txt
 
 COPY test_script.py function_logger.py ./
+COPY prodwatch ./prodwatch
 
 ENV PYTHONUNBUFFERED=1
 

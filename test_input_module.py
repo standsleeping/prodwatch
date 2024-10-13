@@ -38,7 +38,7 @@ def test_handle_ipc_inject(tmp_path):
         assert log_file.exists()
         log_contents = log_file.read_text()
         assert (
-            "Function get_user_input called with args: (), kwargs: {}, result: test input"
+            "Function test_script.get_user_input called with args: (), kwargs: {}, result: test input"
             in log_contents
         )
 
