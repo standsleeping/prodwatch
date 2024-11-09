@@ -37,4 +37,4 @@ class FunctionInjector:
             return result
 
         setattr(module, function_name, logged_function)
-        return True 
+        return True

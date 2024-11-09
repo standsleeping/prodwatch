@@ -1,53 +1,13 @@
 import os
 import sys
-import pytest
 import types
 from unittest.mock import patch, MagicMock
-from prodwatch.prodwatch import (
+from prodwatch.ipc.server import (
     handle_ipc,
-    add_project_to_path,
 )
 
-from prodwatch.function_injector import find_function
-
-class TestIPC:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        # Setup mock socket connection
-        self.mock_conn = MagicMock()
-
-    def test_handle_ipc_inject_command(self):
-        self.mock_conn.recv.side_effect = [b"INJECT:test_function", b"STOP"]
-
-        with patch("prodwatch.prodwatch.FunctionInjector") as MockInjector:
-            mock_injector = MockInjector.return_value
-            mock_injector.inject_function.return_value = True
-
-            handle_ipc(self.mock_conn)
-
-            mock_injector.inject_function.assert_called_once_with("test_function")
-            self.mock_conn.send.assert_called_with(b"SUCCESS")
-
-    def test_handle_ipc_stop_command(self):
-        self.mock_conn.recv.return_value = b"STOP"
-
-        handle_ipc(self.mock_conn)
-
-        self.mock_conn.close.assert_called_once()
-
-    def test_handle_ipc_inject_failure(self):
-        self.mock_conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
-
-        with patch("prodwatch.prodwatch.FunctionInjector") as MockInjector:
-            mock_injector = MockInjector.return_value
-            mock_injector.inject_function.return_value = False
-
-            handle_ipc(self.mock_conn)
-
-            mock_injector.inject_function.assert_called_once_with(
-                "nonexistent_function"
-            )
-            self.mock_conn.send.assert_called_with(b"FUNCTION_NOT_FOUND")
+from prodwatch.module_loader.loader import add_project_to_path
+from prodwatch.injection.function_injector import find_function
 
 
 def test_inject_existing_function(tmp_path):
@@ -143,3 +103,43 @@ def test_add_project_to_path(tmp_path):
     assert sys.path[0] == project_root
 
     sys.path = original_sys_path
+
+
+def calculate_sum(a, b):
+    result = int(a) + int(b)
+    print(f"{a} + {b} = {result}")
+    return result
+
+
+def test_handle_ipc_inject(tmp_path):
+    mock_conn = MagicMock()
+    mock_conn.recv.side_effect = [b"INJECT:calculate_sum", b"STOP"]
+
+    log_file = tmp_path / "log_file.txt"
+
+    with patch.dict(os.environ, {"APP_LOG_FILE": str(log_file)}):
+        handle_ipc(mock_conn)
+
+        # Call the new calculate_sum and check if it logs
+        with patch("builtins.input", return_value="test input"):
+            calculate_sum(2, 3)
+
+        # Check if the original calculate_sum was replaced
+        assert calculate_sum.__name__ == "logged_function"
+
+        # Verify the log file contents
+        assert log_file.exists()
+        log_contents = log_file.read_text()
+        assert (
+            "Function tests.ipc.test_server.calculate_sum called with args: (2, 3), kwargs: {}, result: 5\n"
+            in log_contents
+        )
+
+
+def test_handle_ipc_inject_nonexistent_function():
+    mock_conn = MagicMock()
+    mock_conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
+
+    handle_ipc(mock_conn)
+
+    mock_conn.send.assert_called_with(b"FUNCTION_NOT_FOUND")

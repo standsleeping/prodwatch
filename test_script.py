@@ -1,6 +1,7 @@
 import random
 import time
-from prodwatch.prodwatch import start_prodwatch
+from prodwatch import start_prodwatch
+
 
 def calculate_sum(a, b):
     result = int(a) + int(b)
