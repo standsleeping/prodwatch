@@ -1,8 +1,12 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import sys
 import os
 import types
-from prodwatch.prodwatch import handle_ipc
+from prodwatch.prodwatch import (
+    handle_ipc,
+    find_function,
+    add_project_to_path,
+)
 
 
 def test_inject_existing_function(tmp_path):
@@ -36,7 +40,7 @@ def test_inject_existing_function(tmp_path):
     # Check the log file content
     with open(log_file, "r") as f:
         log_content = f.read()
-    expected_log = 'Function dummy_module.sample_function called with args: (5,), kwargs: {}, result: 10\n'
+    expected_log = "Function dummy_module.sample_function called with args: (5,), kwargs: {}, result: 10\n"
     assert expected_log == log_content
 
     # Delete the dummy module and log file
@@ -63,3 +67,38 @@ def test_handle_ipc_malformed_data():
     conn.recv.side_effect = [b"", b"STOP"]
     handle_ipc(conn)
     conn.close.assert_called_once()
+
+
+def test_find_function_existing():
+    def sample_function():
+        pass
+
+    dummy_module = types.ModuleType("dummy_module")
+    dummy_module.sample_function = sample_function
+    sys.modules["dummy_module"] = dummy_module
+
+    module, func = find_function("sample_function")
+
+    assert module == dummy_module
+    assert func == sample_function
+
+    del sys.modules["dummy_module"]
+
+
+def test_find_function_nonexistent():
+    function_name = "nonexistent_function"
+    module, func = find_function(function_name)
+    assert module is None
+    assert func is None
+
+
+def test_add_project_to_path(tmp_path):
+    project_root = str(tmp_path)
+    original_sys_path = sys.path.copy()
+
+    with patch("os.getcwd", return_value=project_root):
+        add_project_to_path()
+
+    assert sys.path[0] == project_root
+
+    sys.path = original_sys_path
