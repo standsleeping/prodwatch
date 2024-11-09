@@ -1,8 +1,11 @@
 import os
-import socket
 import threading
 import inspect
-from prodwatch.handle_ipc import handle_ipc, add_project_to_path, import_user_modules
+from prodwatch.handle_ipc import (
+    start_ipc_server,
+    add_project_to_path,
+    import_user_modules,
+)
 
 
 def get_user_input():
@@ -15,17 +18,6 @@ def calculate_sum(a, b):
     result = int(a) + int(b)
     print(f"{a} + {b} = {result}")
     return result
-
-
-def start_ipc_server():
-    if os.path.exists("/tmp/prd_watch_socket"):
-        os.remove("/tmp/prd_watch_socket")
-    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    server.bind("/tmp/prd_watch_socket")
-    server.listen(1)
-    conn, addr = server.accept()
-    handle_ipc(conn)
-    server.close()
 
 
 if __name__ == "__main__":
