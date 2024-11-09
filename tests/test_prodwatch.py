@@ -5,10 +5,10 @@ import types
 from unittest.mock import patch, MagicMock
 from prodwatch.prodwatch import (
     handle_ipc,
-    find_function,
     add_project_to_path,
 )
 
+from prodwatch.function_injector import find_function
 
 class TestIPC:
     @pytest.fixture(autouse=True)
