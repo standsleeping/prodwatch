@@ -1,12 +1,53 @@
-from unittest.mock import MagicMock, patch
-import sys
 import os
+import sys
+import pytest
 import types
+from unittest.mock import patch, MagicMock
 from prodwatch.prodwatch import (
     handle_ipc,
     find_function,
     add_project_to_path,
 )
+
+
+class TestIPC:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        # Setup mock socket connection
+        self.mock_conn = MagicMock()
+
+    def test_handle_ipc_inject_command(self):
+        self.mock_conn.recv.side_effect = [b"INJECT:test_function", b"STOP"]
+
+        with patch("prodwatch.prodwatch.FunctionInjector") as MockInjector:
+            mock_injector = MockInjector.return_value
+            mock_injector.inject_function.return_value = True
+
+            handle_ipc(self.mock_conn)
+
+            mock_injector.inject_function.assert_called_once_with("test_function")
+            self.mock_conn.send.assert_called_with(b"SUCCESS")
+
+    def test_handle_ipc_stop_command(self):
+        self.mock_conn.recv.return_value = b"STOP"
+
+        handle_ipc(self.mock_conn)
+
+        self.mock_conn.close.assert_called_once()
+
+    def test_handle_ipc_inject_failure(self):
+        self.mock_conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
+
+        with patch("prodwatch.prodwatch.FunctionInjector") as MockInjector:
+            mock_injector = MockInjector.return_value
+            mock_injector.inject_function.return_value = False
+
+            handle_ipc(self.mock_conn)
+
+            mock_injector.inject_function.assert_called_once_with(
+                "nonexistent_function"
+            )
+            self.mock_conn.send.assert_called_with(b"FUNCTION_NOT_FOUND")
 
 
 def test_inject_existing_function(tmp_path):

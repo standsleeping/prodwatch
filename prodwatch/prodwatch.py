@@ -16,38 +16,44 @@ def find_function(function_name):
     return None, None
 
 
+class FunctionInjector:
+    def __init__(self, log_file=None):
+        self.log_file = log_file or os.environ.get("APP_LOG_FILE", "/app/log_file.txt")
+
+    def inject_function(self, function_name):
+        print(f"Injecting {function_name}")
+        module, original_function = find_function(function_name)
+        print(f"Module: {module}, Original function: {original_function}")
+
+        if not (module and original_function):
+            return False
+
+        def logged_function(*args, **kwargs):
+            result = original_function(*args, **kwargs)
+            try:
+                with open(self.log_file, "a") as f:
+                    write_string = f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
+                    f.write(write_string)
+                print(f"Logged {module.__name__}.{function_name} call")
+            except Exception as e:
+                print(f"Error writing to log file: {e}")
+            return result
+
+        setattr(module, function_name, logged_function)
+        return True
+
+
 def handle_ipc(conn):
+    injector = FunctionInjector()
+
     while True:
         data = conn.recv(1024).decode().split(":")
         command = data[0]
 
         if command == "INJECT":
             function_name = data[1]
-            print(f"Injecting {function_name}")
-
-            module, original_function = find_function(function_name)
-            print(f"Module: {module}, Original function: {original_function}")
-
-            if module and original_function:
-
-                def logged_function(*args, **kwargs):
-                    result = original_function(*args, **kwargs)
-                    try:
-                        with open(
-                            os.environ.get("APP_LOG_FILE", "/app/log_file.txt"), "a"
-                        ) as f:
-                            f.write(
-                                f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
-                            )
-                        print(f"Logged {module.__name__}.{function_name} call")
-                    except Exception as e:
-                        print(f"Error writing to log file: {e}")
-                    return result
-
-                setattr(module, function_name, logged_function)
-                conn.send("SUCCESS".encode())
-            else:
-                conn.send("FUNCTION_NOT_FOUND".encode())
+            success = injector.inject_function(function_name)
+            conn.send("SUCCESS".encode() if success else "FUNCTION_NOT_FOUND".encode())
 
         elif command == "STOP":
             break
@@ -69,7 +75,7 @@ def start_ipc_server():
 def import_user_modules():
     project_root = os.getcwd()
     for root, dirs, files in os.walk(project_root):
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = [d for d in dirs if not d.startswith(".")]
         for file in files:
             if file.endswith(".py"):
                 module_path = os.path.relpath(os.path.join(root, file), project_root)
