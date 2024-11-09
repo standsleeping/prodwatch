@@ -1,11 +1,5 @@
-import os
-import threading
 import inspect
-from prodwatch.handle_ipc import (
-    start_ipc_server,
-    add_project_to_path,
-    import_user_modules,
-)
+from prodwatch.handle_ipc import start_prodwatch
 
 
 def get_user_input():
@@ -21,13 +15,7 @@ def calculate_sum(a, b):
 
 
 if __name__ == "__main__":
-    add_project_to_path()
-    import_user_modules()
-
-    print(f"Input module is running (PID: {os.getpid()}).")
-
-    ipc_thread = threading.Thread(target=start_ipc_server)
-    ipc_thread.start()
+    start_prodwatch()
 
     try:
         while True:

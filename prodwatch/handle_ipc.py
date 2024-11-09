@@ -2,6 +2,7 @@ import os
 import sys
 import importlib
 import socket
+import threading
 
 
 def find_function(function_name):
@@ -65,12 +66,6 @@ def start_ipc_server():
     server.close()
 
 
-def add_project_to_path():
-    project_root = os.getcwd()
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
-
 def import_user_modules():
     project_root = os.getcwd()
     for root, dirs, files in os.walk(project_root):
@@ -83,3 +78,16 @@ def import_user_modules():
                     importlib.import_module(module_name)
                 except ImportError:
                     print(f"Failed to import {module_name}")
+
+
+def add_project_to_path():
+    project_root = os.getcwd()
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+
+
+def start_prodwatch():
+    add_project_to_path()
+    import_user_modules()
+    ipc_thread = threading.Thread(target=start_ipc_server)
+    ipc_thread.start()
