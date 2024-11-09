@@ -1,5 +1,5 @@
 import inspect
-from prodwatch.handle_ipc import start_prodwatch
+from prodwatch.prodwatch import start_prodwatch
 
 
 def get_user_input():

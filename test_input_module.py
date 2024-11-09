@@ -1,6 +1,6 @@
 from unittest.mock import patch, MagicMock
 import test_script
-from prodwatch.handle_ipc import handle_ipc
+from prodwatch.prodwatch import handle_ipc
 import os
 
 
