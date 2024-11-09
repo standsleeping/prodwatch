@@ -1,12 +1,6 @@
-import inspect
+import random
+import time
 from prodwatch.prodwatch import start_prodwatch
-
-
-def get_user_input():
-    user_input = input("Enter something: ")
-    print(f"You entered: {user_input}")
-    return user_input
-
 
 def calculate_sum(a, b):
     result = int(a) + int(b)
@@ -17,24 +11,9 @@ def calculate_sum(a, b):
 if __name__ == "__main__":
     start_prodwatch()
 
-    try:
-        while True:
-            function_name = input("Enter function name to call (or 'quit' to exit): ")
-            if function_name == "quit":
-                break
-            if function_name in globals() and callable(globals()[function_name]):
-                func = globals()[function_name]
-                sig = inspect.signature(func)
-                args = []
-                for param in sig.parameters.values():
-                    arg = input(f"Enter value for {param.name}: ")
-                    args.append(
-                        type(param.annotation)(arg)
-                        if param.annotation != inspect.Parameter.empty
-                        else arg
-                    )
-                func(*args)
-            else:
-                print(f"Function {function_name} not found.")
-    except KeyboardInterrupt:
-        print("\nInput module stopped.")
+    for _ in range(100):
+        a = random.randint(0, 100)
+        b = random.randint(0, 100)
+        print(f"Calling calculate_sum with {a} and {b}")
+        calculate_sum(a, b)
+        time.sleep(5)
