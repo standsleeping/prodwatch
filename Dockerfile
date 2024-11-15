@@ -12,9 +12,9 @@ WORKDIR /app
 RUN touch /app/log_file.txt && \
     chmod 666 /app/log_file.txt
 
-COPY test_script.py request_injection.py ./
+COPY run_prodwatch.py request_injection.py ./
 COPY prodwatch ./prodwatch
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python3", "test_script.py"]
+CMD ["python3", "run_prodwatch.py"]
