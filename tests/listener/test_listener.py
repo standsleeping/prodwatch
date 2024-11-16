@@ -22,20 +22,14 @@ class TestListenerConnection:
     """Tests for server connection functionality."""
 
     def test_check_connection_success(self):
-        with patch("requests.get") as mock_get:
-            mock_get.return_value.status_code = 200
+        with patch("requests.post") as mock_post:
+            mock_post.return_value.status_code = 200
             listener = Listener("http://test-url")
             assert listener.check_connection() is True
 
-    def test_check_connection_failure_404(self):
-        with patch("requests.get") as mock_get:
-            mock_get.side_effect = RequestException("404 Client Error")
-            listener = Listener("http://test-url")
-            assert listener.check_connection() is False
-
     def test_check_connection_failure_connection_error(self):
-        with patch("requests.get") as mock_get:
-            mock_get.side_effect = RequestException("Connection refused")
+        with patch("requests.post") as mock_post:
+            mock_post.side_effect = RequestException("Connection refused")
             listener = Listener("http://test-url")
             assert listener.check_connection() is False
 

@@ -5,6 +5,7 @@ from typing import Optional
 from ..injection.function_injector import FunctionInjector
 import logging
 from requests.exceptions import RequestException
+from .system_identification import SystemInfoSerializer, get_system_identifier
 
 
 class Listener:
@@ -68,13 +69,16 @@ class Listener:
             time.sleep(self.poll_interval)
 
     def check_connection(self) -> bool:
+        connection_url = f"{self.base_listening_url}/start-connection"
+        system_info = get_system_identifier()
+        payload = {"system_info": SystemInfoSerializer.to_dict(system_info)}
         try:
-            response = requests.get(self.base_listening_url)
+            response = requests.post(connection_url, json=payload)
             response.raise_for_status()
-            message = f"Successfully connected to prodwatch server at {self.base_listening_url}"
+            message = f"Successfully connected to prodwatch server at {connection_url}"
             self.logger.info(message)
             return True
         except RequestException:
-            message = f"Failed to connect to prodwatch server at {self.base_listening_url}"
+            message = f"Failed to connect to prodwatch server at {connection_url}"
             self.logger.error(message)
             return False
