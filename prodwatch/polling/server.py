@@ -3,6 +3,8 @@ import threading
 import requests
 from typing import Optional
 from ..injection.function_injector import FunctionInjector
+import logging
+from requests.exceptions import RequestException
 
 
 class ServerPoller:
@@ -12,6 +14,7 @@ class ServerPoller:
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
         self.injector = FunctionInjector()
+        self.logger = logging.getLogger("prodwatch")
 
     def start(self):
         if self.active:
@@ -63,3 +66,13 @@ class ServerPoller:
                 print(f"Error polling server: {e}")
 
             time.sleep(self.poll_interval)
+
+    def check_connection(self) -> bool:
+        try:
+            response = requests.get(self.server_url)
+            response.raise_for_status()
+            self.logger.info(f"Successfully connected to prodwatch server at {self.server_url}")
+            return True
+        except RequestException:
+            self.logger.error(f"Failed to connect to prodwatch server at {self.server_url}")
+            return False

@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 import threading
 from prodwatch.polling.server import ServerPoller
+from requests.exceptions import RequestException
 
 
 @pytest.fixture
@@ -105,3 +106,23 @@ def test_polling_loop_with_exception(mock_get, server_poller):
             server_poller._polling_loop()
 
             mock_print.assert_called_once_with("Error polling server: Test error")
+
+
+class TestServerPoller:
+    def test_check_connection_success(self):
+        with patch('requests.get') as mock_get:
+            mock_get.return_value.status_code = 200
+            poller = ServerPoller("http://test-url")
+            assert poller.check_connection() is True
+
+    def test_check_connection_failure_404(self):
+        with patch('requests.get') as mock_get:
+            mock_get.side_effect = RequestException("404 Client Error")
+            poller = ServerPoller("http://test-url")
+            assert poller.check_connection() is False
+
+    def test_check_connection_failure_connection_error(self):
+        with patch('requests.get') as mock_get:
+            mock_get.side_effect = RequestException("Connection refused")
+            poller = ServerPoller("http://test-url")
+            assert poller.check_connection() is False
