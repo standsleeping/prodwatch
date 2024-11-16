@@ -12,7 +12,7 @@ class TestListenerInitialization:
 
     def test_initialization(self, listener):
         """Test proper initialization of Listener attributes."""
-        assert listener.server_url == "http://test-server.com"
+        assert listener.base_listening_url == "http://test-server.com"
         assert listener.poll_interval == 0.1
         assert listener.polling_thread is None
         assert listener.active is False

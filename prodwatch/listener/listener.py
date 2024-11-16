@@ -8,8 +8,8 @@ from requests.exceptions import RequestException
 
 
 class Listener:
-    def __init__(self, server_url: str, poll_interval: int = 5):
-        self.server_url = server_url
+    def __init__(self, base_listening_url: str, poll_interval: int = 5):
+        self.base_listening_url = base_listening_url
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
@@ -34,7 +34,7 @@ class Listener:
 
     def _get_pending_injections(self):
         """Get list of pending function injections from server."""
-        response = requests.get(f"{self.server_url}/pending-injections")
+        response = requests.get(f"{self.base_listening_url}/pending-injections")
         if response.status_code != 200:
             return []
         payload = response.json()
@@ -43,7 +43,7 @@ class Listener:
     def _report_injection_success(self, function_name: str):
         """Report successful injection back to server."""
         requests.post(
-            f"{self.server_url}/injection-status",
+            f"{self.base_listening_url}/injection-status",
             json={
                 "function_name": function_name,
                 "status": "success",
@@ -69,12 +69,12 @@ class Listener:
 
     def check_connection(self) -> bool:
         try:
-            response = requests.get(self.server_url)
+            response = requests.get(self.base_listening_url)
             response.raise_for_status()
-            message = f"Successfully connected to prodwatch server at {self.server_url}"
+            message = f"Successfully connected to prodwatch server at {self.base_listening_url}"
             self.logger.info(message)
             return True
         except RequestException:
-            message = f"Failed to connect to prodwatch server at {self.server_url}"
+            message = f"Failed to connect to prodwatch server at {self.base_listening_url}"
             self.logger.error(message)
             return False
