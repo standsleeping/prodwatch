@@ -4,36 +4,49 @@ from starlette.applications import Starlette
 from starlette.responses import HTMLResponse
 from starlette.requests import Request
 from .rendering import render_view
+from .services.watch_function import watch_function
 
 
 app = Starlette()
 
 
 @app.route("/")
-async def homepage(request: Request):
+async def homepage_route(request: Request):
     form_url = "/watch-function"
     form_name = "watch-function-form.html"
     form_data = {"form_url": form_url}
     watch_function_form = render_view(form_name, form_data)
-    page_data = {
-        "title": "Home",
-        "content": watch_function_form,
-    }
-    page = render_view("page.html", page_data)
-    return HTMLResponse(page)
+
+    response_view_name = "page.html"
+    return HTMLResponse(
+        render_view(
+            response_view_name,
+            {
+                "title": "Home",
+                "content": watch_function_form,
+            },
+        )
+    )
 
 
 @app.route("/watch-function", methods=["POST"])
-async def watch_function(request: Request):
+async def watch_function_route(request: Request):
     form_data = await request.form()
-    function = form_data.get("function")
+    function = str(form_data.get("function"))
     function_id = str(uuid.uuid4())
 
-    response_view = render_view(
-        "form-response.html", {"function_id": function_id, "function": function}
-    )
+    watch_function(function)
 
-    return HTMLResponse(response_view)
+    response_view_name = "form-response.html"
+    return HTMLResponse(
+        render_view(
+            response_view_name,
+            {
+                "function_id": function_id,
+                "function": function,
+            },
+        )
+    )
 
 
 if __name__ == "__main__":
