@@ -10,7 +10,7 @@ from prodwatch.module_loader.loader import add_project_to_path
 from prodwatch.injection.function_watcher import find_function
 
 
-def test_inject_existing_function(tmp_path):
+def test_watch_existing_function(tmp_path):
     conn = MagicMock()
     conn.recv.side_effect = [b"WATCH:sample_function", b"STOP"]
 
@@ -34,7 +34,7 @@ def test_inject_existing_function(tmp_path):
     conn.send.assert_called_with(b"SUCCESS")
     assert dummy_module.sample_function != sample_function
 
-    # Call the injected function
+    # Call the watched function
     result = dummy_module.sample_function(5)
     assert result == 10
 
