@@ -10,7 +10,7 @@ def handle_ipc(conn):
         data = conn.recv(1024).decode().split(":")
         command = data[0]
 
-        if command == "INJECT":
+        if command == "WATCH":
             function_name = data[1]
             success = watcher.watch_function(function_name)
             conn.send("SUCCESS".encode() if success else "FUNCTION_NOT_FOUND".encode())

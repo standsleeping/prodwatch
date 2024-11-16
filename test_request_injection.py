@@ -18,7 +18,7 @@ def test_watch_function_success(mock_socket):
         watch_function("test_function")
 
     mock_client.connect.assert_called_once_with("/tmp/prd_watch_socket")
-    mock_client.send.assert_called_once_with(b"INJECT:test_function")
+    mock_client.send.assert_called_once_with(b"WATCH:test_function")
     mock_client.recv.assert_called_once_with(1024)
     mock_client.close.assert_called_once()
     mock_print.assert_called_once_with("Received response: SUCCESS")
@@ -33,7 +33,7 @@ def test_watch_function_function_not_found(mock_socket):
         watch_function("nonexistent_function")
 
     mock_client.connect.assert_called_once_with("/tmp/prd_watch_socket")
-    mock_client.send.assert_called_once_with(b"INJECT:nonexistent_function")
+    mock_client.send.assert_called_once_with(b"WATCH:nonexistent_function")
     mock_client.recv.assert_called_once_with(1024)
     mock_client.close.assert_called_once()
     mock_print.assert_called_once_with("Received response: FUNCTION_NOT_FOUND")

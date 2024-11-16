@@ -5,7 +5,7 @@ def watch_function(function_name):
     client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         client.connect("/tmp/prd_watch_socket")
-        client.send(f"INJECT:{function_name}".encode())
+        client.send(f"WATCH:{function_name}".encode())
         response = client.recv(1024).decode()
         print(f"Received response: {response}")
     except Exception as e:

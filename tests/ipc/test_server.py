@@ -12,7 +12,7 @@ from prodwatch.injection.function_injector import find_function
 
 def test_inject_existing_function(tmp_path):
     conn = MagicMock()
-    conn.recv.side_effect = [b"INJECT:sample_function", b"STOP"]
+    conn.recv.side_effect = [b"WATCH:sample_function", b"STOP"]
 
     # Create dummy module and function
     dummy_module = types.ModuleType("dummy_module")
@@ -51,7 +51,7 @@ def test_inject_existing_function(tmp_path):
 
 def test_inject_nonexistent_function():
     conn = MagicMock()
-    conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
+    conn.recv.side_effect = [b"WATCH:nonexistent_function", b"STOP"]
     handle_ipc(conn)
     conn.send.assert_called_with(b"FUNCTION_NOT_FOUND")
 
@@ -113,7 +113,7 @@ def calculate_sum(a, b):
 
 def test_handle_ipc_inject(tmp_path):
     mock_conn = MagicMock()
-    mock_conn.recv.side_effect = [b"INJECT:calculate_sum", b"STOP"]
+    mock_conn.recv.side_effect = [b"WATCH:calculate_sum", b"STOP"]
 
     log_file = tmp_path / "log_file.txt"
 
@@ -138,7 +138,7 @@ def test_handle_ipc_inject(tmp_path):
 
 def test_handle_ipc_inject_nonexistent_function():
     mock_conn = MagicMock()
-    mock_conn.recv.side_effect = [b"INJECT:nonexistent_function", b"STOP"]
+    mock_conn.recv.side_effect = [b"WATCH:nonexistent_function", b"STOP"]
 
     handle_ipc(mock_conn)
 
