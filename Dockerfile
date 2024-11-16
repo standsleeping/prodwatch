@@ -12,7 +12,7 @@ WORKDIR /app
 RUN touch /app/log_file.txt && \
     chmod 666 /app/log_file.txt
 
-COPY run_prodwatch.py request_injection.py ./
+COPY run_prodwatch.py request_function_watch.py ./
 COPY prodwatch ./prodwatch
 
 ENV PYTHONUNBUFFERED=1

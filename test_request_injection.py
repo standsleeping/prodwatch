@@ -1,11 +1,11 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from request_injection import watch_function
+from request_function_watch import watch_function
 
 
 @pytest.fixture
 def mock_socket():
-    with patch("request_injection.socket.socket") as mock:
+    with patch("request_function_watch.socket.socket") as mock:
         yield mock
 
 
