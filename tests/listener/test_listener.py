@@ -79,13 +79,13 @@ class TestListenerInjections:
             },
         )
 
-    def test_process_pending_injections(self, listener):
+    def test_process_pending_watch_requests(self, listener):
         """Test processing of multiple pending injections."""
         listener.watcher.watch_function = Mock(return_value=True)
         listener._report_watch_success = Mock()
 
         function_names = ["func1", "func2"]
-        listener._process_pending_injections(function_names)
+        listener._process_pending_watch_requests(function_names)
 
         assert listener.watcher.watch_function.call_count == 2
         assert listener._report_watch_success.call_count == 2

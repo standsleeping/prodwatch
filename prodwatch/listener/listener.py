@@ -51,7 +51,7 @@ class Listener:
             },
         )
 
-    def _process_pending_injections(self, function_names: list[str]):
+    def _process_pending_watch_requests(self, function_names: list[str]):
         """Process list of pending function injections."""
         for function_name in function_names:
             success = self.watcher.watch_function(function_name)
@@ -62,7 +62,7 @@ class Listener:
         while self.active:
             try:
                 function_names = self._get_pending_watch_requests()
-                self._process_pending_injections(function_names)
+                self._process_pending_watch_requests(function_names)
             except Exception as e:
                 print(f"Error polling server: {e}")
 
