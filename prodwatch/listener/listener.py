@@ -7,7 +7,7 @@ import logging
 from requests.exceptions import RequestException
 
 
-class ServerPoller:
+class Listener:
     def __init__(self, server_url: str, poll_interval: int = 5):
         self.server_url = server_url
         self.poll_interval = poll_interval
@@ -71,8 +71,10 @@ class ServerPoller:
         try:
             response = requests.get(self.server_url)
             response.raise_for_status()
-            self.logger.info(f"Successfully connected to prodwatch server at {self.server_url}")
+            message = f"Successfully connected to prodwatch server at {self.server_url}"
+            self.logger.info(message)
             return True
         except RequestException:
-            self.logger.error(f"Failed to connect to prodwatch server at {self.server_url}")
+            message = f"Failed to connect to prodwatch server at {self.server_url}"
+            self.logger.error(message)
             return False
