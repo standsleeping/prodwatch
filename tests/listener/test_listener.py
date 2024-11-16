@@ -67,9 +67,9 @@ class TestListenerInjections:
         mock_get.assert_called_once_with("http://test-server.com/pending-injections")
 
     @patch("requests.post")
-    def test_report_injection_success(self, mock_post, listener):
+    def test_report_watch_success(self, mock_post, listener):
         """Test successful reporting of injection status."""
-        listener._report_injection_success("test_function")
+        listener._report_watch_success("test_function")
 
         mock_post.assert_called_once_with(
             "http://test-server.com/injection-status",
@@ -82,18 +82,18 @@ class TestListenerInjections:
     def test_process_pending_injections(self, listener):
         """Test processing of multiple pending injections."""
         listener.watcher.watch_function = Mock(return_value=True)
-        listener._report_injection_success = Mock()
+        listener._report_watch_success = Mock()
 
         function_names = ["func1", "func2"]
         listener._process_pending_injections(function_names)
 
         assert listener.watcher.watch_function.call_count == 2
-        assert listener._report_injection_success.call_count == 2
+        assert listener._report_watch_success.call_count == 2
 
         listener.watcher.watch_function.assert_any_call("func1")
         listener.watcher.watch_function.assert_any_call("func2")
-        listener._report_injection_success.assert_any_call("func1")
-        listener._report_injection_success.assert_any_call("func2")
+        listener._report_watch_success.assert_any_call("func1")
+        listener._report_watch_success.assert_any_call("func2")
 
 
 class TestListenerLifecycle:

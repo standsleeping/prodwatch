@@ -41,7 +41,7 @@ class Listener:
         payload = response.json()
         return payload.get("function_names", [])
 
-    def _report_injection_success(self, function_name: str):
+    def _report_watch_success(self, function_name: str):
         """Report successful injection back to server."""
         requests.post(
             f"{self.base_listening_url}/injection-status",
@@ -56,7 +56,7 @@ class Listener:
         for function_name in function_names:
             success = self.watcher.watch_function(function_name)
             if success:
-                self._report_injection_success(function_name)
+                self._report_watch_success(function_name)
 
     def _polling_loop(self):
         while self.active:
