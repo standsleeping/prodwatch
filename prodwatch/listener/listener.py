@@ -14,7 +14,7 @@ class Listener:
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
-        self.injector = FunctionWatcher()
+        self.watcher = FunctionWatcher()
         self.logger = logging.getLogger("prodwatch")
 
     def start(self):
@@ -54,7 +54,7 @@ class Listener:
     def _process_pending_injections(self, function_names: list[str]):
         """Process list of pending function injections."""
         for function_name in function_names:
-            success = self.injector.watch_function(function_name)
+            success = self.watcher.watch_function(function_name)
             if success:
                 self._report_injection_success(function_name)
 

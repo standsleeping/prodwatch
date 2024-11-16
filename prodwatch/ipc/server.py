@@ -4,7 +4,7 @@ from prodwatch.injection.function_injector import FunctionWatcher
 
 
 def handle_ipc(conn):
-    injector = FunctionWatcher()
+    watcher = FunctionWatcher()
 
     while True:
         data = conn.recv(1024).decode().split(":")
@@ -12,7 +12,7 @@ def handle_ipc(conn):
 
         if command == "INJECT":
             function_name = data[1]
-            success = injector.watch_function(function_name)
+            success = watcher.watch_function(function_name)
             conn.send("SUCCESS".encode() if success else "FUNCTION_NOT_FOUND".encode())
 
         elif command == "STOP":

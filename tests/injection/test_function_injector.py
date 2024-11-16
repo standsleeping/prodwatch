@@ -7,8 +7,8 @@ from prodwatch.injection.function_injector import FunctionWatcher
 class TestFunctionWatcher:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.injector = FunctionWatcher()
-        return self.injector
+        self.watcher = FunctionWatcher()
+        return self.watcher
 
     def test_watch_function_success(self):
         mock_module = MagicMock()
@@ -17,7 +17,7 @@ class TestFunctionWatcher:
         with patch("prodwatch.injection.function_injector.find_function") as mock_find:
             mock_find.return_value = (mock_module, mock_function)
 
-            result = self.injector.watch_function("test_function")
+            result = self.watcher.watch_function("test_function")
 
             assert result is True
             assert hasattr(mock_module, "test_function")
@@ -26,7 +26,7 @@ class TestFunctionWatcher:
         with patch("prodwatch.injection.function_injector.find_function") as mock_find:
             mock_find.return_value = (None, None)
 
-            result = self.injector.watch_function("nonexistent_function")
+            result = self.watcher.watch_function("nonexistent_function")
 
             assert result is False
 
@@ -40,7 +40,7 @@ class TestFunctionWatcher:
         ):
             mock_find.return_value = (mock_module, mock_function)
 
-            self.injector.watch_function("test_function")
+            self.watcher.watch_function("test_function")
 
             wrapped_function = getattr(mock_module, "test_function")
             wrapped_function("arg1", kwarg1="value1")
