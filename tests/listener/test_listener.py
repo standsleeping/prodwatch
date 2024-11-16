@@ -34,8 +34,8 @@ class TestListenerConnection:
             assert listener.check_connection() is False
 
 
-class TestListenerInjections:
-    """Tests for injection-related functionality."""
+class TestListenerWatchRequests:
+    """Tests for watch request-related functionality."""
 
     @pytest.fixture
     def listener(self):
@@ -68,7 +68,7 @@ class TestListenerInjections:
 
     @patch("requests.post")
     def test_report_watch_success(self, mock_post, listener):
-        """Test successful reporting of injection status."""
+        """Test successful reporting of watch request status."""
         listener._report_watch_success("test_function")
 
         mock_post.assert_called_once_with(
@@ -80,7 +80,7 @@ class TestListenerInjections:
         )
 
     def test_process_pending_watch_requests(self, listener):
-        """Test processing of multiple pending injections."""
+        """Test processing of multiple pending watch requests."""
         listener.watcher.watch_function = Mock(return_value=True)
         listener._report_watch_success = Mock()
 

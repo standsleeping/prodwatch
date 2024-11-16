@@ -49,7 +49,7 @@ def test_inject_existing_function(tmp_path):
     del os.environ["APP_LOG_FILE"]
 
 
-def test_inject_nonexistent_function():
+def test_watch_nonexistent_function():
     conn = MagicMock()
     conn.recv.side_effect = [b"WATCH:nonexistent_function", b"STOP"]
     handle_ipc(conn)
@@ -111,7 +111,7 @@ def calculate_sum(a, b):
     return result
 
 
-def test_handle_ipc_inject(tmp_path):
+def test_handle_ipc_watch(tmp_path):
     mock_conn = MagicMock()
     mock_conn.recv.side_effect = [b"WATCH:calculate_sum", b"STOP"]
 
@@ -136,7 +136,7 @@ def test_handle_ipc_inject(tmp_path):
         )
 
 
-def test_handle_ipc_inject_nonexistent_function():
+def test_handle_ipc_watch_nonexistent_function():
     mock_conn = MagicMock()
     mock_conn.recv.side_effect = [b"WATCH:nonexistent_function", b"STOP"]
 
