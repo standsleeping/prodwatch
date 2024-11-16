@@ -18,7 +18,7 @@ class FunctionWatcher:
         self.log_file = log_file or os.environ.get("APP_LOG_FILE", "/app/log_file.txt")
 
     def watch_function(self, function_name):
-        print(f"Injecting {function_name}")
+        print(f"Watching {function_name}")
         module, original_function = find_function(function_name)
         print(f"Module: {module}, Original function: {original_function}")
 

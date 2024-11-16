@@ -2,12 +2,10 @@ import os
 import sys
 import types
 from unittest.mock import patch, MagicMock
-from prodwatch.ipc.server import (
-    handle_ipc,
-)
+from prodwatch.ipc.server import handle_ipc
 
 from prodwatch.module_loader.loader import add_project_to_path
-from prodwatch.injection.function_watcher import find_function
+from prodwatch.watcher.function_watcher import find_function
 
 
 def test_watch_existing_function(tmp_path):

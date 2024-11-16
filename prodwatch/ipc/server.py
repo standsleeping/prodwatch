@@ -1,6 +1,6 @@
 import socket
 import os
-from prodwatch.injection.function_watcher import FunctionWatcher
+from prodwatch.watcher.function_watcher import FunctionWatcher
 
 
 def handle_ipc(conn):

@@ -2,7 +2,7 @@ import time
 import threading
 import requests
 from typing import Optional
-from ..injection.function_watcher import FunctionWatcher
+from ..watcher.function_watcher import FunctionWatcher
 import logging
 from requests.exceptions import RequestException
 from .system_identification import SystemInfoSerializer, get_system_identifier
@@ -34,7 +34,7 @@ class Listener:
             self.polling_thread.join()
 
     def _get_pending_watch_requests(self):
-        """Get list of pending function injections from server."""
+        """Get list of pending function watch requests from server."""
         response = requests.get(f"{self.base_listening_url}/pending-watch-requests")
         if response.status_code != 200:
             return []
@@ -42,7 +42,7 @@ class Listener:
         return payload.get("function_names", [])
 
     def _report_watch_success(self, function_name: str):
-        """Report successful injection back to server."""
+        """Report successful watch request back to server."""
         requests.post(
             f"{self.base_listening_url}/watch-request-status",
             json={
@@ -52,7 +52,7 @@ class Listener:
         )
 
     def _process_pending_watch_requests(self, function_names: list[str]):
-        """Process list of pending function injections."""
+        """Process list of pending function watch requests."""
         for function_name in function_names:
             success = self.watcher.watch_function(function_name)
             if success:
