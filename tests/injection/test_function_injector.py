@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, mock_open
 
-from prodwatch.injection.function_injector import FunctionWatcher
+from prodwatch.injection.function_watcher import FunctionWatcher
 
 
 class TestFunctionWatcher:
@@ -14,7 +14,7 @@ class TestFunctionWatcher:
         mock_module = MagicMock()
         mock_function = MagicMock()
 
-        with patch("prodwatch.injection.function_injector.find_function") as mock_find:
+        with patch("prodwatch.injection.function_watcher.find_function") as mock_find:
             mock_find.return_value = (mock_module, mock_function)
 
             result = self.watcher.watch_function("test_function")
@@ -23,7 +23,7 @@ class TestFunctionWatcher:
             assert hasattr(mock_module, "test_function")
 
     def test_watch_function_not_found(self):
-        with patch("prodwatch.injection.function_injector.find_function") as mock_find:
+        with patch("prodwatch.injection.function_watcher.find_function") as mock_find:
             mock_find.return_value = (None, None)
 
             result = self.watcher.watch_function("nonexistent_function")
@@ -35,7 +35,7 @@ class TestFunctionWatcher:
         mock_function = MagicMock(return_value="test_result")
         mock_file = mock_open()
 
-        with patch("prodwatch.injection.function_injector.find_function") as mock_find, patch(
+        with patch("prodwatch.injection.function_watcher.find_function") as mock_find, patch(
             "builtins.open", mock_file
         ):
             mock_find.return_value = (mock_module, mock_function)

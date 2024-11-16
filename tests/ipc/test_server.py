@@ -7,7 +7,7 @@ from prodwatch.ipc.server import (
 )
 
 from prodwatch.module_loader.loader import add_project_to_path
-from prodwatch.injection.function_injector import find_function
+from prodwatch.injection.function_watcher import find_function
 
 
 def test_inject_existing_function(tmp_path):
