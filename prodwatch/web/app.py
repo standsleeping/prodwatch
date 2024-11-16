@@ -9,6 +9,7 @@ from .services.watch_function import watch_function
 from .views.render_view import render_view
 from .views.render_connected_processes import render_connected_processes
 from .views.render_function_watch_form import render_function_watch_form
+from .views.render_function_watch_request import render_function_watch_request
 
 
 def render_page(title: str, content: str) -> HTMLResponse:
@@ -40,18 +41,9 @@ async def watch_function_route(request: Request):
     form_data = await request.form()
     function = str(form_data.get("function"))
     function_id = str(uuid.uuid4())
-
     watch_function(function)
-
-    page_content = render_view(
-        "form-response.html",
-        {
-            "function_id": function_id,
-            "function": function,
-        },
-    )
-
-    return render_page("Form Response", page_content)
+    watch_function_request = render_function_watch_request(function_id, function)
+    return render_page("Form Response", watch_function_request)
 
 
 @app.route("/start-connection", methods=["POST"])
