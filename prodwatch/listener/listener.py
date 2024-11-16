@@ -2,7 +2,7 @@ import time
 import threading
 import requests
 from typing import Optional
-from ..injection.function_injector import FunctionInjector
+from ..injection.function_injector import FunctionWatcher
 import logging
 from requests.exceptions import RequestException
 from .system_identification import SystemInfoSerializer, get_system_identifier
@@ -14,7 +14,7 @@ class Listener:
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
-        self.injector = FunctionInjector()
+        self.injector = FunctionWatcher()
         self.logger = logging.getLogger("prodwatch")
 
     def start(self):

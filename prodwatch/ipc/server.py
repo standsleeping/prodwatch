@@ -1,10 +1,10 @@
 import socket
 import os
-from prodwatch.injection.function_injector import FunctionInjector
+from prodwatch.injection.function_injector import FunctionWatcher
 
 
 def handle_ipc(conn):
-    injector = FunctionInjector()
+    injector = FunctionWatcher()
 
     while True:
         data = conn.recv(1024).decode().split(":")

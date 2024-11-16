@@ -13,7 +13,7 @@ def find_function(function_name):
     return None, None
 
 
-class FunctionInjector:
+class FunctionWatcher:
     def __init__(self, log_file=None):
         self.log_file = log_file or os.environ.get("APP_LOG_FILE", "/app/log_file.txt")
 

@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import patch, MagicMock, mock_open
 
-from prodwatch.injection.function_injector import FunctionInjector
+from prodwatch.injection.function_injector import FunctionWatcher
 
 
-class TestFunctionInjector:
+class TestFunctionWatcher:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.injector = FunctionInjector()
+        self.injector = FunctionWatcher()
         return self.injector
 
     def test_inject_function_success(self):
