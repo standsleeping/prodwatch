@@ -33,9 +33,9 @@ class Listener:
         if self.polling_thread:
             self.polling_thread.join()
 
-    def _get_pending_watch_requests(self):
+    def _get_pending_watchers(self):
         """Get list of pending function watch requests from server."""
-        response = requests.get(f"{self.base_listening_url}/pending-watch-requests")
+        response = requests.get(f"{self.base_listening_url}/pending-watchers")
         if response.status_code != 200:
             return []
         payload = response.json()
@@ -51,7 +51,7 @@ class Listener:
             },
         )
 
-    def _process_pending_watch_requests(self, function_names: list[str]):
+    def _process_pending_watchers(self, function_names: list[str]):
         """Process list of pending function watch requests."""
         for function_name in function_names:
             success = self.watcher.watch_function(function_name)
@@ -61,10 +61,10 @@ class Listener:
     def _polling_loop(self):
         while self.active:
             try:
-                function_names = self._get_pending_watch_requests()
-                self._process_pending_watch_requests(function_names)
-            except Exception:
-                print("Error polling Prodwatch server")
+                function_names = self._get_pending_watchers()
+                self._process_pending_watchers(function_names)
+            except Exception as e:
+                self.logger.error(f"Error polling Prodwatch server: {e}")
 
             time.sleep(self.poll_interval)
 

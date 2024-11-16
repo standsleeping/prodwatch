@@ -42,33 +42,29 @@ class TestListenerWatchRequests:
         return Listener("http://test-server.com", poll_interval=0.1)
 
     @patch("requests.get")
-    def test_get_pending_watch_requests_success(self, mock_get, listener):
+    def test_get_pending_watchers_success(self, mock_get, listener):
         """Test successful retrieval of pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"function_names": ["func1", "func2"]}
         mock_get.return_value = mock_response
 
-        result = listener._get_pending_watch_requests()
+        result = listener._get_pending_watchers()
 
         assert result == ["func1", "func2"]
-        mock_get.assert_called_once_with(
-            "http://test-server.com/pending-watch-requests"
-        )
+        mock_get.assert_called_once_with("http://test-server.com/pending-watchers")
 
     @patch("requests.get")
-    def test_get_pending_watch_requests_error(self, mock_get, listener):
+    def test_get_pending_watchers_error(self, mock_get, listener):
         """Test error handling when retrieving pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 500
         mock_get.return_value = mock_response
 
-        result = listener._get_pending_watch_requests()
+        result = listener._get_pending_watchers()
 
         assert result == []
-        mock_get.assert_called_once_with(
-            "http://test-server.com/pending-watch-requests"
-        )
+        mock_get.assert_called_once_with("http://test-server.com/pending-watchers")
 
     @patch("requests.post")
     def test_report_watch_success(self, mock_post, listener):
@@ -83,13 +79,13 @@ class TestListenerWatchRequests:
             },
         )
 
-    def test_process_pending_watch_requests(self, listener):
+    def test_process_pending_watchers(self, listener):
         """Test processing of multiple pending watch requests."""
         listener.watcher.watch_function = Mock(return_value=True)
         listener._report_watch_success = Mock()
 
         function_names = ["func1", "func2"]
-        listener._process_pending_watch_requests(function_names)
+        listener._process_pending_watchers(function_names)
 
         assert listener.watcher.watch_function.call_count == 2
         assert listener._report_watch_success.call_count == 2
@@ -138,7 +134,9 @@ class TestListenerLifecycle:
             listener.active = False
 
         with patch("time.sleep", side_effect=stop_after_call):
-            with patch("builtins.print") as mock_print:
+            # TEST that self.logger.error(f"Error polling Prodwatch server: {e}")
+            with patch("logging.Logger.error") as mock_error:
                 listener.active = True
                 listener._polling_loop()
-                mock_print.assert_called_once_with("Error polling Prodwatch server")
+                error_message = "Error polling Prodwatch server: Test error"
+                mock_error.assert_called_once_with(error_message)
