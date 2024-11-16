@@ -33,7 +33,7 @@ class Listener:
         if self.polling_thread:
             self.polling_thread.join()
 
-    def _get_pending_injections(self):
+    def _get_pending_watch_requests(self):
         """Get list of pending function injections from server."""
         response = requests.get(f"{self.base_listening_url}/pending-injections")
         if response.status_code != 200:
@@ -61,7 +61,7 @@ class Listener:
     def _polling_loop(self):
         while self.active:
             try:
-                function_names = self._get_pending_injections()
+                function_names = self._get_pending_watch_requests()
                 self._process_pending_injections(function_names)
             except Exception as e:
                 print(f"Error polling server: {e}")

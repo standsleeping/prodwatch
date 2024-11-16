@@ -42,26 +42,26 @@ class TestListenerInjections:
         return Listener("http://test-server.com", poll_interval=0.1)
 
     @patch("requests.get")
-    def test_get_pending_injections_success(self, mock_get, listener):
-        """Test successful retrieval of pending injections."""
+    def test_get_pending_watch_requests_success(self, mock_get, listener):
+        """Test successful retrieval of pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"function_names": ["func1", "func2"]}
         mock_get.return_value = mock_response
 
-        result = listener._get_pending_injections()
+        result = listener._get_pending_watch_requests()
 
         assert result == ["func1", "func2"]
         mock_get.assert_called_once_with("http://test-server.com/pending-injections")
 
     @patch("requests.get")
-    def test_get_pending_injections_error(self, mock_get, listener):
-        """Test error handling when retrieving pending injections."""
+    def test_get_pending_watch_requests_error(self, mock_get, listener):
+        """Test error handling when retrieving pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 500
         mock_get.return_value = mock_response
 
-        result = listener._get_pending_injections()
+        result = listener._get_pending_watch_requests()
 
         assert result == []
         mock_get.assert_called_once_with("http://test-server.com/pending-injections")
