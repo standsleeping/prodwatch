@@ -10,23 +10,23 @@ class TestFunctionWatcher:
         self.injector = FunctionWatcher()
         return self.injector
 
-    def test_inject_function_success(self):
+    def test_watch_function_success(self):
         mock_module = MagicMock()
         mock_function = MagicMock()
 
         with patch("prodwatch.injection.function_injector.find_function") as mock_find:
             mock_find.return_value = (mock_module, mock_function)
 
-            result = self.injector.inject_function("test_function")
+            result = self.injector.watch_function("test_function")
 
             assert result is True
             assert hasattr(mock_module, "test_function")
 
-    def test_inject_function_not_found(self):
+    def test_watch_function_not_found(self):
         with patch("prodwatch.injection.function_injector.find_function") as mock_find:
             mock_find.return_value = (None, None)
 
-            result = self.injector.inject_function("nonexistent_function")
+            result = self.injector.watch_function("nonexistent_function")
 
             assert result is False
 
@@ -40,7 +40,7 @@ class TestFunctionWatcher:
         ):
             mock_find.return_value = (mock_module, mock_function)
 
-            self.injector.inject_function("test_function")
+            self.injector.watch_function("test_function")
 
             wrapped_function = getattr(mock_module, "test_function")
             wrapped_function("arg1", kwarg1="value1")

@@ -81,17 +81,17 @@ class TestListenerInjections:
 
     def test_process_pending_injections(self, listener):
         """Test processing of multiple pending injections."""
-        listener.injector.inject_function = Mock(return_value=True)
+        listener.injector.watch_function = Mock(return_value=True)
         listener._report_injection_success = Mock()
 
         function_names = ["func1", "func2"]
         listener._process_pending_injections(function_names)
 
-        assert listener.injector.inject_function.call_count == 2
+        assert listener.injector.watch_function.call_count == 2
         assert listener._report_injection_success.call_count == 2
 
-        listener.injector.inject_function.assert_any_call("func1")
-        listener.injector.inject_function.assert_any_call("func2")
+        listener.injector.watch_function.assert_any_call("func1")
+        listener.injector.watch_function.assert_any_call("func2")
         listener._report_injection_success.assert_any_call("func1")
         listener._report_injection_success.assert_any_call("func2")
 

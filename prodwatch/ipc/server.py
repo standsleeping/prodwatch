@@ -12,7 +12,7 @@ def handle_ipc(conn):
 
         if command == "INJECT":
             function_name = data[1]
-            success = injector.inject_function(function_name)
+            success = injector.watch_function(function_name)
             conn.send("SUCCESS".encode() if success else "FUNCTION_NOT_FOUND".encode())
 
         elif command == "STOP":
