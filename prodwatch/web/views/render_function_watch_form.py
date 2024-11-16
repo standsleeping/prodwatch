@@ -1,4 +1,4 @@
-from ...rendering import render_view
+from .render_view import render_view
 
 
 def render_function_watch_form():

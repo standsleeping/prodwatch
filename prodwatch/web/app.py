@@ -1,18 +1,26 @@
 import uuid
 import uvicorn
+import json
 from starlette.applications import Starlette
-from starlette.responses import HTMLResponse
 from starlette.requests import Request
-from .rendering import render_view
-from .services.watch_function import watch_function
-from .services.rendering.render_connected_processes import render_connected_processes
-from .services.rendering.render_function_watch_form import render_function_watch_form
-from .inputs import parse_json_request
+from starlette.responses import HTMLResponse
 from .data.simple_store import SimpleStore
+from .services.watch_function import watch_function
+from .views.render_view import render_view
+from .views.render_connected_processes import render_connected_processes
+from .views.render_function_watch_form import render_function_watch_form
 
 
 def render_page(title: str, content: str) -> HTMLResponse:
     return HTMLResponse(render_view("page.html", {"title": title, "content": content}))
+
+
+async def parse_json_request(request: Request) -> dict | None:
+    """Attempts to parse JSON from request body. Returns None if parsing fails."""
+    try:
+        return await request.json()
+    except json.JSONDecodeError:
+        return None
 
 
 app = Starlette()
@@ -24,7 +32,6 @@ async def homepage_route(request: Request):
     watch_function_form = render_function_watch_form()
     list_container = render_connected_processes(simple_store.get_processes())
     page_content = watch_function_form + list_container
-
     return render_page("Home", page_content)
 
 

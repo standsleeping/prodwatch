@@ -3,7 +3,7 @@ from string import Template
 
 
 def get_template(template_name: str) -> str:
-    index_file_path = os.path.join(os.path.dirname(__file__), "views", template_name)
+    index_file_path = os.path.join(os.path.dirname(__file__), "html", template_name)
     with open(index_file_path, "r") as file:
         return file.read()
 

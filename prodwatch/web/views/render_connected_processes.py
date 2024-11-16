@@ -1,5 +1,4 @@
-from ...rendering import render_view
-
+from .render_view import render_view
 
 def render_connected_processes(processes: list[dict]) -> str:
     process_list = [f"<div>{process['instance_id']}</div>" for process in processes]
