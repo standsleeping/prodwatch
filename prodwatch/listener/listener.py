@@ -35,7 +35,7 @@ class Listener:
 
     def _get_pending_watch_requests(self):
         """Get list of pending function injections from server."""
-        response = requests.get(f"{self.base_listening_url}/pending-injections")
+        response = requests.get(f"{self.base_listening_url}/pending-watch-requests")
         if response.status_code != 200:
             return []
         payload = response.json()
@@ -44,7 +44,7 @@ class Listener:
     def _report_watch_success(self, function_name: str):
         """Report successful injection back to server."""
         requests.post(
-            f"{self.base_listening_url}/injection-status",
+            f"{self.base_listening_url}/watch-request-status",
             json={
                 "function_name": function_name,
                 "status": "success",

@@ -52,7 +52,7 @@ class TestListenerInjections:
         result = listener._get_pending_watch_requests()
 
         assert result == ["func1", "func2"]
-        mock_get.assert_called_once_with("http://test-server.com/pending-injections")
+        mock_get.assert_called_once_with("http://test-server.com/pending-watch-requests")
 
     @patch("requests.get")
     def test_get_pending_watch_requests_error(self, mock_get, listener):
@@ -64,7 +64,7 @@ class TestListenerInjections:
         result = listener._get_pending_watch_requests()
 
         assert result == []
-        mock_get.assert_called_once_with("http://test-server.com/pending-injections")
+        mock_get.assert_called_once_with("http://test-server.com/pending-watch-requests")
 
     @patch("requests.post")
     def test_report_watch_success(self, mock_post, listener):
@@ -72,7 +72,7 @@ class TestListenerInjections:
         listener._report_watch_success("test_function")
 
         mock_post.assert_called_once_with(
-            "http://test-server.com/injection-status",
+            "http://test-server.com/watch-request-status",
             json={
                 "function_name": "test_function",
                 "status": "success",
