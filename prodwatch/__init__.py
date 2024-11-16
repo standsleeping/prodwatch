@@ -3,7 +3,7 @@ from .listener import Listener
 
 
 def start_prodwatch():
-    base_listening_url = "http://localhost:3000"
+    base_listening_url = "http://localhost:8000"
     listener = Listener(base_listening_url)
 
     if not listener.check_connection():

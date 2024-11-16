@@ -5,6 +5,7 @@ from starlette.responses import HTMLResponse
 from starlette.requests import Request
 from .rendering import render_view
 from .services.watch_function import watch_function
+from .inputs import parse_json_request
 
 
 app = Starlette()
@@ -47,6 +48,16 @@ async def watch_function_route(request: Request):
             },
         )
     )
+
+
+@app.route("/start-connection", methods=["POST"])
+async def start_connection_route(request: Request):
+    system_info = await parse_json_request(request)
+    if system_info is None:
+        return HTMLResponse("Invalid JSON data\n", status_code=400)
+
+    print(system_info)
+    return HTMLResponse("Great!\n")
 
 
 if __name__ == "__main__":
