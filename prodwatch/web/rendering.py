@@ -8,7 +8,7 @@ def get_template(template_name: str) -> str:
         return file.read()
 
 
-def render_view(template_name: str, data: dict) -> str:
+def render_view(template_name: str, data: dict[str, str]) -> str:
     html_template = get_template(template_name)
     template = Template(html_template)
     rendered_html = template.substitute(data)

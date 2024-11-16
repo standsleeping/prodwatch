@@ -52,7 +52,9 @@ class TestListenerWatchRequests:
         result = listener._get_pending_watch_requests()
 
         assert result == ["func1", "func2"]
-        mock_get.assert_called_once_with("http://test-server.com/pending-watch-requests")
+        mock_get.assert_called_once_with(
+            "http://test-server.com/pending-watch-requests"
+        )
 
     @patch("requests.get")
     def test_get_pending_watch_requests_error(self, mock_get, listener):
@@ -64,7 +66,9 @@ class TestListenerWatchRequests:
         result = listener._get_pending_watch_requests()
 
         assert result == []
-        mock_get.assert_called_once_with("http://test-server.com/pending-watch-requests")
+        mock_get.assert_called_once_with(
+            "http://test-server.com/pending-watch-requests"
+        )
 
     @patch("requests.post")
     def test_report_watch_success(self, mock_post, listener):
@@ -137,5 +141,4 @@ class TestListenerLifecycle:
             with patch("builtins.print") as mock_print:
                 listener.active = True
                 listener._polling_loop()
-
-                mock_print.assert_called_once_with("Error polling server: Test error")
+                mock_print.assert_called_once_with("Error polling Prodwatch server")

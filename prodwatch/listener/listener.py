@@ -63,8 +63,8 @@ class Listener:
             try:
                 function_names = self._get_pending_watch_requests()
                 self._process_pending_watch_requests(function_names)
-            except Exception as e:
-                print(f"Error polling server: {e}")
+            except Exception:
+                print("Error polling Prodwatch server")
 
             time.sleep(self.poll_interval)
 
