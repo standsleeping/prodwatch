@@ -7,7 +7,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "web.app:app",
+                "web.starlette_app:app",
                 "--reload",
                 "--log-level", "debug"
             ],
