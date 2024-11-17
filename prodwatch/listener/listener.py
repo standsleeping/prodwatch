@@ -14,8 +14,10 @@ class Listener:
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
-        self.watcher = FunctionWatcher()
         self.logger = logging.getLogger("prodwatch")
+        self.watcher = FunctionWatcher(
+            report_function_call=self._report_function_call,
+        )
 
     def start(self):
         if self.active:
@@ -44,13 +46,24 @@ class Listener:
     def _report_watch_success(self, function_name: str):
         """Report successful watch request back to server."""
         requests.post(
-            f"{self.base_listening_url}/watch-request-status",
+            f"{self.base_listening_url}/watch-success",
             json={
                 "function_name": function_name,
                 "status": "success",
             },
         )
 
+    def _report_function_call(self, function_name: str, args: list, kwargs: dict):
+        """Report function call back to server."""
+        requests.post(
+            f"{self.base_listening_url}/function-call",
+            json={
+                "function_name": function_name,
+                "args": args,
+                "kwargs": kwargs,
+            },
+        )
+    
     def _process_pending_watchers(self, function_names: list[str]):
         """Process list of pending function watch requests."""
         for function_name in function_names:

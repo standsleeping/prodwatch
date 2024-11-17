@@ -72,7 +72,7 @@ class TestListenerWatchRequests:
         listener._report_watch_success("test_function")
 
         mock_post.assert_called_once_with(
-            "http://test-server.com/watch-request-status",
+            "http://test-server.com/watch-success",
             json={
                 "function_name": "test_function",
                 "status": "success",

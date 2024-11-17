@@ -1,11 +1,11 @@
-import uuid
 import uvicorn
 import json
+from datetime import datetime
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from .data.simple_store import SimpleStore
-from .services.watch_function import watch_function
+from .models import Watcher, Process
 from .views.render_view import render_view
 from .views.render_connected_processes import render_connected_processes
 from .views.render_watcher_form import render_watcher_form
@@ -36,7 +36,8 @@ simple_store = SimpleStore()
 @app.route("/")
 async def homepage_route(request: Request):
     watch_function_form = render_watcher_form()
-    list_container = render_connected_processes(simple_store.get_processes())
+    process_ids = [process.instance_id for process in simple_store.get_processes()]
+    list_container = render_connected_processes(process_ids)
     page_content = watch_function_form + list_container
     return render_page("Home", page_content)
 
@@ -44,11 +45,11 @@ async def homepage_route(request: Request):
 @app.route("/watch-function", methods=["POST"])
 async def watch_function_route(request: Request):
     form_data = await request.form()
-    function = str(form_data.get("function"))
-    function_id = str(uuid.uuid4())
-    watch_function(function)
-    watch_function_request = render_watcher(function_id, function)
-    return render_page("Form Response", watch_function_request)
+    function_name = str(form_data.get("function_name"))
+    watcher = Watcher(function_name=function_name, status="pending", calls=[])
+    simple_store.add_watcher(watcher)
+    watcher_view = render_watcher()
+    return render_page("Form Response", watcher_view)
 
 
 # -----------------------------------------------------------------------------
@@ -67,14 +68,57 @@ async def start_connection_route(request: Request):
         return JSONResponse("Invalid request\n", status_code=400)
 
     instance_id = system_info["process"]["instance_id"]
-    simple_store.connect_process(instance_id)
+    new_process = Process(
+        instance_id=instance_id,
+        connected_at=datetime.now(),
+    )
+    simple_store.add_process(new_process)
     return JSONResponse("Success\n", status_code=200)
 
 
 @app.route("/pending-watchers", methods=["GET"])
 async def pending_watchers_route(request: Request):
     response: dict[str, list[str]] = {"function_names": []}
+    all_watchers = simple_store.get_watchers()
+    for watcher in all_watchers:
+        if watcher.status == "pending":
+            response["function_names"].append(watcher.function_name)
+
     return JSONResponse(response, status_code=200)
+
+
+@app.route("/watch-success", methods=["POST"])
+async def watch_success_route(request: Request):
+    request_data = await parse_json_request(request)
+    if request_data is None:
+        return JSONResponse("Invalid JSON data\n", status_code=400)
+
+    function_name = request_data.get("function_name")
+    if function_name is None:
+        return JSONResponse("Invalid request\n", status_code=400)
+
+    watcher = simple_store.get_watcher(function_name)
+
+    watcher.status = "success"
+    return JSONResponse("Success\n", status_code=200)
+
+
+
+@app.route("/function-call", methods=["POST"])
+async def function_call_route(request: Request):
+    request_data = await parse_json_request(request)
+    if request_data is None:
+        return JSONResponse("Invalid JSON data\n", status_code=400)
+
+    function_name = request_data.get("function_name")
+    if function_name is None:
+        return JSONResponse("Invalid request\n", status_code=400)
+
+    watcher = simple_store.get_watcher(function_name)
+    watcher.calls.append(request_data)
+    print(f"Received {function_name} call from {watcher.function_name}")
+    print(f"Calls: {watcher.calls}")
+    return JSONResponse("Success\n", status_code=200)
 
 
 if __name__ == "__main__":

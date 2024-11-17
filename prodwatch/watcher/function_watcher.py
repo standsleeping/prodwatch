@@ -1,4 +1,3 @@
-import os
 import sys
 
 
@@ -14,8 +13,8 @@ def find_function(function_name):
 
 
 class FunctionWatcher:
-    def __init__(self, log_file=None):
-        self.log_file = log_file or os.environ.get("APP_LOG_FILE", "/app/log_file.txt")
+    def __init__(self, report_function_call):
+        self.report_function_call = report_function_call
 
     def watch_function(self, function_name):
         print(f"Watching {function_name}")
@@ -28,10 +27,9 @@ class FunctionWatcher:
         def logged_function(*args, **kwargs):
             result = original_function(*args, **kwargs)
             try:
-                with open(self.log_file, "a") as f:
-                    write_string = f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
-                    f.write(write_string)
-                print(f"Logged {module.__name__}.{function_name} call")
+                self.report_function_call(function_name, args, kwargs)
+                write_string = f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
+                print(write_string)
             except Exception as e:
                 print(f"Error writing to log file: {e}")
             return result

@@ -16,5 +16,5 @@ def test_homepage(client):
 
 
 def test_submit_function_watch(client):
-    response = client.post("/watch-function", data={"function_name": "test_function"})
+    response = client.post("/watch-function", data={"function_names": "test_function"})
     assert response.status_code == 200
