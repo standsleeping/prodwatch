@@ -4,14 +4,13 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from app import ProdwatchApp
-from .views.render_view import render_view
-from .views.render_connected_processes import render_connected_processes
-from .views.render_watcher_form import render_watcher_form
-from .views.render_watcher import render_watcher
+from .views.render_html import render_html
+from .views.process_list import process_list
+from .views.watch_function_form import watch_function_form
 
 
 def render_page(title: str, content: str) -> HTMLResponse:
-    return HTMLResponse(render_view("page.html", {"title": title, "content": content}))
+    return HTMLResponse(render_html("page.html", {"title": title, "content": content}))
 
 
 async def parse_json_request(request: Request) -> dict | None:
@@ -32,10 +31,10 @@ app = ProdwatchApp()
 
 @server.route("/")
 async def homepage_route(request: Request):
-    watch_function_form = render_watcher_form()
+    form_html = watch_function_form()
     process_ids = app.get_process_ids()
-    list_container = render_connected_processes(process_ids)
-    page_content = watch_function_form + list_container
+    list_container = process_list(process_ids)
+    page_content = form_html + list_container
     return render_page("Home", page_content)
 
 
@@ -44,7 +43,7 @@ async def watch_function_route(request: Request):
     form_data = await request.form()
     function_name = str(form_data.get("function_name"))
     app.add_watcher(function_name)
-    watcher_view = render_watcher()
+    watcher_view = "<div>Watcher added</div>"
     return render_page("Form Response", watcher_view)
 
 
