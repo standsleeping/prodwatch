@@ -24,7 +24,7 @@ async def parse_json_request(request: Request) -> dict | None:
         return None
 
 
-app = Starlette()
+server = Starlette()
 simple_store = SimpleStore()
 
 
@@ -33,7 +33,7 @@ simple_store = SimpleStore()
 # -----------------------------------------------------------------------------
 
 
-@app.route("/")
+@server.route("/")
 async def homepage_route(request: Request):
     watch_function_form = render_watcher_form()
     process_ids = [process.instance_id for process in simple_store.get_processes()]
@@ -42,7 +42,7 @@ async def homepage_route(request: Request):
     return render_page("Home", page_content)
 
 
-@app.route("/watch-function", methods=["POST"])
+@server.route("/watch-function", methods=["POST"])
 async def watch_function_route(request: Request):
     form_data = await request.form()
     function_name = str(form_data.get("function_name"))
@@ -57,7 +57,7 @@ async def watch_function_route(request: Request):
 # -----------------------------------------------------------------------------
 
 
-@app.route("/start-connection", methods=["POST"])
+@server.route("/start-connection", methods=["POST"])
 async def start_connection_route(request: Request):
     request_data = await parse_json_request(request)
     if request_data is None:
@@ -76,7 +76,7 @@ async def start_connection_route(request: Request):
     return JSONResponse("Success\n", status_code=200)
 
 
-@app.route("/pending-watchers", methods=["GET"])
+@server.route("/pending-watchers", methods=["GET"])
 async def pending_watchers_route(request: Request):
     response: dict[str, list[str]] = {"function_names": []}
     all_watchers = simple_store.get_watchers()
@@ -87,7 +87,7 @@ async def pending_watchers_route(request: Request):
     return JSONResponse(response, status_code=200)
 
 
-@app.route("/watch-success", methods=["POST"])
+@server.route("/watch-success", methods=["POST"])
 async def watch_success_route(request: Request):
     request_data = await parse_json_request(request)
     if request_data is None:
@@ -104,7 +104,7 @@ async def watch_success_route(request: Request):
 
 
 
-@app.route("/function-call", methods=["POST"])
+@server.route("/function-call", methods=["POST"])
 async def function_call_route(request: Request):
     request_data = await parse_json_request(request)
     if request_data is None:
@@ -122,4 +122,4 @@ async def function_call_route(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(server, host="127.0.0.1", port=8000)

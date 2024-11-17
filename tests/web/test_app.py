@@ -1,10 +1,10 @@
 import pytest
 from starlette.testclient import TestClient
-from web.starlette_app import app
+from web.starlette_app import server
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    return TestClient(server)
 
 
 def test_homepage(client):
