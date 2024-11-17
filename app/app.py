@@ -42,9 +42,9 @@ class ProdwatchApp:
                 watcher.status = WatcherStatus.CONFIRMED
                 return
 
-    def get_pending_watchers(self) -> list[Watcher]:
+    def get_pending_function_names(self) -> list[str]:
         return [
-            watcher
+            watcher.function_name
             for watcher in self.watchers
             if watcher.status == WatcherStatus.PENDING
         ]
