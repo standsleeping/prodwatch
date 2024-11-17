@@ -7,7 +7,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "prodwatch.web.app:app",
+                "web.app:app",
                 "--reload",
                 "--log-level", "debug"
             ],

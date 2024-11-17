@@ -1,7 +1,6 @@
 import pytest
 from starlette.testclient import TestClient
-from prodwatch.web.app import app
-
+from web.app import app
 
 @pytest.fixture
 def client():
