@@ -1,5 +1,5 @@
 import pytest
-from prodwatch.watcher.function_watcher import FunctionWatcher
+from prodwatch.manager.function_watcher import FunctionWatcher
 
 
 def sample_function():

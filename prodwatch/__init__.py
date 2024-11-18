@@ -1,5 +1,5 @@
 from .module_loader.loader import add_project_to_path, import_user_modules
-from .watcher import Listener
+from .manager import Listener
 
 
 def start_prodwatch():

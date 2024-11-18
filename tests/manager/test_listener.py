@@ -2,7 +2,7 @@ import pytest
 import threading
 from unittest.mock import Mock, patch
 from requests.exceptions import RequestException
-from prodwatch.watcher import Listener
+from prodwatch.manager import Listener
 
 
 class TestListenerInitialization:
