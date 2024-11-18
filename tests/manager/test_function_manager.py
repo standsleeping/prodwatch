@@ -1,5 +1,5 @@
 import pytest
-from prodwatch.manager.function_watcher import FunctionWatcher
+from prodwatch.manager.function_manager import FunctionManager
 
 
 def sample_function():
@@ -24,7 +24,7 @@ class TestFunctionWatcher:
 
     def test_watch_function_basic(self, mock_logger):
         log_function_call, calls = mock_logger
-        watcher = FunctionWatcher(log_function_call)
+        watcher = FunctionManager(log_function_call)
 
         # Watch the test function
         success = watcher.watch_function("sample_function")
@@ -44,7 +44,7 @@ class TestFunctionWatcher:
 
     def test_watch_function_with_arguments(self, mock_logger):
         log_function_call, calls = mock_logger
-        watcher = FunctionWatcher(log_function_call)
+        watcher = FunctionManager(log_function_call)
 
         # Watch the test function
         success = watcher.watch_function("sample_function_with_args")
@@ -64,7 +64,7 @@ class TestFunctionWatcher:
 
     def test_watch_nonexistent_function(self, mock_logger):
         log_function_call, calls = mock_logger
-        watcher = FunctionWatcher(log_function_call)
+        watcher = FunctionManager(log_function_call)
 
         # Try to watch a function that doesn't exist
         success = watcher.watch_function("nonexistent_function")
@@ -77,7 +77,7 @@ class TestFunctionWatcher:
         def failing_logger(function_name, args, kwargs):
             raise Exception("Report failed")
 
-        watcher = FunctionWatcher(failing_logger)
+        watcher = FunctionManager(failing_logger)
         success = watcher.watch_function("sample_function")
         assert success is True
 

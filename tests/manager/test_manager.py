@@ -42,26 +42,26 @@ class TestManagerWatchRequests:
         return Manager("http://test-server.com", poll_interval=0.1)
 
     @patch("requests.get")
-    def test_get_pending_watchers_success(self, mock_get, manager):
+    def test_get_pending_function_names_success(self, mock_get, manager):
         """Test successful retrieval of pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"function_names": ["func1", "func2"]}
         mock_get.return_value = mock_response
 
-        result = manager._get_pending_watchers()
+        result = manager.get_pending_function_names()
 
         assert result == ["func1", "func2"]
         mock_get.assert_called_once_with("http://test-server.com/pending-function-names")
 
     @patch("requests.get")
-    def test_get_pending_watchers_error(self, mock_get, manager):
+    def test_get_pending_function_names_error(self, mock_get, manager):
         """Test error handling when retrieving pending watch requests."""
         mock_response = Mock()
         mock_response.status_code = 500
         mock_get.return_value = mock_response
 
-        result = manager._get_pending_watchers()
+        result = manager.get_pending_function_names()
 
         assert result == []
         mock_get.assert_called_once_with("http://test-server.com/pending-function-names")
@@ -69,7 +69,7 @@ class TestManagerWatchRequests:
     @patch("requests.post")
     def test_confirm_watcher(self, mock_post, manager):
         """Test successful reporting of watch request status."""
-        manager._confirm_watcher("test_function")
+        manager.confirm_watcher("test_function")
 
         mock_post.assert_called_once_with(
             "http://test-server.com/confirm-watcher",
@@ -81,19 +81,19 @@ class TestManagerWatchRequests:
 
     def test_process_pending_watchers(self, manager):
         """Test processing of multiple pending watch requests."""
-        manager.watcher.watch_function = Mock(return_value=True)
-        manager._confirm_watcher = Mock()
+        manager.function_manager.watch_function = Mock(return_value=True)
+        manager.confirm_watcher = Mock()
 
         function_names = ["func1", "func2"]
-        manager._process_pending_watchers(function_names)
+        manager.process_pending_watchers(function_names)
 
-        assert manager.watcher.watch_function.call_count == 2
-        assert manager._confirm_watcher.call_count == 2
+        assert manager.function_manager.watch_function.call_count == 2
+        assert manager.confirm_watcher.call_count == 2
 
-        manager.watcher.watch_function.assert_any_call("func1")
-        manager.watcher.watch_function.assert_any_call("func2")
-        manager._confirm_watcher.assert_any_call("func1")
-        manager._confirm_watcher.assert_any_call("func2")
+        manager.function_manager.watch_function.assert_any_call("func1")
+        manager.function_manager.watch_function.assert_any_call("func2")
+        manager.confirm_watcher.assert_any_call("func1")
+        manager.confirm_watcher.assert_any_call("func2")
 
 
 class TestManagerLifecycle:
@@ -137,6 +137,6 @@ class TestManagerLifecycle:
             # TEST that self.logger.error(f"Error polling Prodwatch server: {e}")
             with patch("logging.Logger.error") as mock_error:
                 manager.active = True
-                manager._polling_loop()
+                manager.polling_loop()
                 error_message = "Error polling Prodwatch server: Test error"
                 mock_error.assert_called_once_with(error_message)

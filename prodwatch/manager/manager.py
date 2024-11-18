@@ -2,7 +2,7 @@ import time
 import threading
 import requests
 from typing import Optional
-from .function_watcher import FunctionWatcher
+from .function_manager import FunctionManager
 import logging
 from requests.exceptions import RequestException
 from .system_identification import SystemInfoSerializer, get_system_identifier
@@ -15,8 +15,8 @@ class Manager:
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
         self.logger = logging.getLogger("prodwatch")
-        self.watcher = FunctionWatcher(
-            log_function_call=self._log_function_call,
+        self.function_manager = FunctionManager(
+            log_function_call=self.log_function_call,
         )
 
     def start(self):
@@ -24,7 +24,7 @@ class Manager:
             return
 
         self.active = True
-        self.polling_thread = threading.Thread(target=self._polling_loop, daemon=True)
+        self.polling_thread = threading.Thread(target=self.polling_loop, daemon=True)
         self.polling_thread.start()
 
     def stop(self):
@@ -35,7 +35,7 @@ class Manager:
         if self.polling_thread:
             self.polling_thread.join()
 
-    def _get_pending_watchers(self):
+    def get_pending_function_names(self):
         """Get list of pending function watch requests from server."""
         response = requests.get(f"{self.base_server_url}/pending-function-names")
         if response.status_code != 200:
@@ -43,7 +43,7 @@ class Manager:
         payload = response.json()
         return payload.get("function_names", [])
 
-    def _confirm_watcher(self, function_name: str):
+    def confirm_watcher(self, function_name: str):
         """Report successful watch request back to server."""
         requests.post(
             f"{self.base_server_url}/confirm-watcher",
@@ -53,7 +53,7 @@ class Manager:
             },
         )
 
-    def _log_function_call(self, function_name: str, args: list, kwargs: dict):
+    def log_function_call(self, function_name: str, args: list, kwargs: dict):
         """Report function call back to server."""
         requests.post(
             f"{self.base_server_url}/log-function-call",
@@ -64,18 +64,18 @@ class Manager:
             },
         )
 
-    def _process_pending_watchers(self, function_names: list[str]):
+    def process_pending_watchers(self, function_names: list[str]):
         """Process list of pending function watch requests."""
         for function_name in function_names:
-            success = self.watcher.watch_function(function_name)
+            success = self.function_manager.watch_function(function_name)
             if success:
-                self._confirm_watcher(function_name)
+                self.confirm_watcher(function_name)
 
-    def _polling_loop(self):
+    def polling_loop(self):
         while self.active:
             try:
-                function_names = self._get_pending_watchers()
-                self._process_pending_watchers(function_names)
+                function_names = self.get_pending_function_names()
+                self.process_pending_watchers(function_names)
             except Exception as e:
                 self.logger.error(f"Error polling Prodwatch server: {e}")
 

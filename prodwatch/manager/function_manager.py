@@ -12,7 +12,7 @@ def find_function(function_name):
     return None, None
 
 
-class FunctionWatcher:
+class FunctionManager:
     def __init__(self, log_function_call):
         self.log_function_call = log_function_call
 
