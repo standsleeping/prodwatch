@@ -4,7 +4,7 @@ import uuid
 import json
 from unittest.mock import patch
 
-from prodwatch.listener.system_identification import (
+from prodwatch.watcher.system_identification import (
     SystemHardware,
     NetworkIdentity,
     RuntimeEnvironment,

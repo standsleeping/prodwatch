@@ -2,7 +2,7 @@ import time
 import threading
 import requests
 from typing import Optional
-from ..watcher.function_watcher import FunctionWatcher
+from .function_watcher import FunctionWatcher
 import logging
 from requests.exceptions import RequestException
 from .system_identification import SystemInfoSerializer, get_system_identifier
