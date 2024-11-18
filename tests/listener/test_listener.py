@@ -52,7 +52,7 @@ class TestListenerWatchRequests:
         result = listener._get_pending_watchers()
 
         assert result == ["func1", "func2"]
-        mock_get.assert_called_once_with("http://test-server.com/pending-watchers")
+        mock_get.assert_called_once_with("http://test-server.com/pending-function-names")
 
     @patch("requests.get")
     def test_get_pending_watchers_error(self, mock_get, listener):
@@ -64,15 +64,15 @@ class TestListenerWatchRequests:
         result = listener._get_pending_watchers()
 
         assert result == []
-        mock_get.assert_called_once_with("http://test-server.com/pending-watchers")
+        mock_get.assert_called_once_with("http://test-server.com/pending-function-names")
 
     @patch("requests.post")
-    def test_report_watch_success(self, mock_post, listener):
+    def test_confirm_watcher(self, mock_post, listener):
         """Test successful reporting of watch request status."""
-        listener._report_watch_success("test_function")
+        listener._confirm_watcher("test_function")
 
         mock_post.assert_called_once_with(
-            "http://test-server.com/watch-success",
+            "http://test-server.com/confirm-watcher",
             json={
                 "function_name": "test_function",
                 "status": "success",
@@ -82,18 +82,18 @@ class TestListenerWatchRequests:
     def test_process_pending_watchers(self, listener):
         """Test processing of multiple pending watch requests."""
         listener.watcher.watch_function = Mock(return_value=True)
-        listener._report_watch_success = Mock()
+        listener._confirm_watcher = Mock()
 
         function_names = ["func1", "func2"]
         listener._process_pending_watchers(function_names)
 
         assert listener.watcher.watch_function.call_count == 2
-        assert listener._report_watch_success.call_count == 2
+        assert listener._confirm_watcher.call_count == 2
 
         listener.watcher.watch_function.assert_any_call("func1")
         listener.watcher.watch_function.assert_any_call("func2")
-        listener._report_watch_success.assert_any_call("func1")
-        listener._report_watch_success.assert_any_call("func2")
+        listener._confirm_watcher.assert_any_call("func1")
+        listener._confirm_watcher.assert_any_call("func2")
 
 
 class TestListenerLifecycle:

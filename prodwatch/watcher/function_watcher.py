@@ -13,8 +13,8 @@ def find_function(function_name):
 
 
 class FunctionWatcher:
-    def __init__(self, report_function_call):
-        self.report_function_call = report_function_call
+    def __init__(self, log_function_call):
+        self.log_function_call = log_function_call
 
     def watch_function(self, function_name):
         print(f"Watching {function_name}")
@@ -27,7 +27,7 @@ class FunctionWatcher:
         def logged_function(*args, **kwargs):
             result = original_function(*args, **kwargs)
             try:
-                self.report_function_call(function_name, args, kwargs)
+                self.log_function_call(function_name, args, kwargs)
                 write_string = f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
                 print(write_string)
             except Exception as e:

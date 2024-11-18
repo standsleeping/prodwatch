@@ -16,7 +16,7 @@ class Listener:
         self.polling_thread: Optional[threading.Thread] = None
         self.logger = logging.getLogger("prodwatch")
         self.watcher = FunctionWatcher(
-            report_function_call=self._report_function_call,
+            log_function_call=self._log_function_call,
         )
 
     def start(self):
@@ -37,39 +37,39 @@ class Listener:
 
     def _get_pending_watchers(self):
         """Get list of pending function watch requests from server."""
-        response = requests.get(f"{self.base_listening_url}/pending-watchers")
+        response = requests.get(f"{self.base_listening_url}/pending-function-names")
         if response.status_code != 200:
             return []
         payload = response.json()
         return payload.get("function_names", [])
 
-    def _report_watch_success(self, function_name: str):
+    def _confirm_watcher(self, function_name: str):
         """Report successful watch request back to server."""
         requests.post(
-            f"{self.base_listening_url}/watch-success",
+            f"{self.base_listening_url}/confirm-watcher",
             json={
                 "function_name": function_name,
                 "status": "success",
             },
         )
 
-    def _report_function_call(self, function_name: str, args: list, kwargs: dict):
+    def _log_function_call(self, function_name: str, args: list, kwargs: dict):
         """Report function call back to server."""
         requests.post(
-            f"{self.base_listening_url}/function-call",
+            f"{self.base_listening_url}/log-function-call",
             json={
                 "function_name": function_name,
                 "args": args,
                 "kwargs": kwargs,
             },
         )
-    
+
     def _process_pending_watchers(self, function_names: list[str]):
         """Process list of pending function watch requests."""
         for function_name in function_names:
             success = self.watcher.watch_function(function_name)
             if success:
-                self._report_watch_success(function_name)
+                self._confirm_watcher(function_name)
 
     def _polling_loop(self):
         while self.active:
@@ -82,7 +82,7 @@ class Listener:
             time.sleep(self.poll_interval)
 
     def check_connection(self) -> bool:
-        connection_url = f"{self.base_listening_url}/start-connection"
+        connection_url = f"{self.base_listening_url}/add-process"
         system_info = get_system_identifier()
         payload = {"system_info": SystemInfoSerializer.to_dict(system_info)}
         try:
