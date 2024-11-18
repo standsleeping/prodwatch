@@ -8,9 +8,9 @@ from requests.exceptions import RequestException
 from .system_identification import SystemInfoSerializer, get_system_identifier
 
 
-class Listener:
-    def __init__(self, base_listening_url: str, poll_interval: int = 5):
-        self.base_listening_url = base_listening_url
+class Manager:
+    def __init__(self, base_server_url: str, poll_interval: int = 5):
+        self.base_server_url = base_server_url
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
@@ -37,7 +37,7 @@ class Listener:
 
     def _get_pending_watchers(self):
         """Get list of pending function watch requests from server."""
-        response = requests.get(f"{self.base_listening_url}/pending-function-names")
+        response = requests.get(f"{self.base_server_url}/pending-function-names")
         if response.status_code != 200:
             return []
         payload = response.json()
@@ -46,7 +46,7 @@ class Listener:
     def _confirm_watcher(self, function_name: str):
         """Report successful watch request back to server."""
         requests.post(
-            f"{self.base_listening_url}/confirm-watcher",
+            f"{self.base_server_url}/confirm-watcher",
             json={
                 "function_name": function_name,
                 "status": "success",
@@ -56,7 +56,7 @@ class Listener:
     def _log_function_call(self, function_name: str, args: list, kwargs: dict):
         """Report function call back to server."""
         requests.post(
-            f"{self.base_listening_url}/log-function-call",
+            f"{self.base_server_url}/log-function-call",
             json={
                 "function_name": function_name,
                 "args": args,
@@ -82,7 +82,7 @@ class Listener:
             time.sleep(self.poll_interval)
 
     def check_connection(self) -> bool:
-        connection_url = f"{self.base_listening_url}/add-process"
+        connection_url = f"{self.base_server_url}/add-process"
         system_info = get_system_identifier()
         payload = {"system_info": SystemInfoSerializer.to_dict(system_info)}
         try:
