@@ -1,5 +1,5 @@
 import time
-from prodwatch.profiling.simple_profiler import SimpleProfiler
+from prodwatch.profiler.simple_profiler import SimpleProfiler
 
 
 def test_init():
