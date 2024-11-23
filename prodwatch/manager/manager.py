@@ -46,18 +46,19 @@ class Manager:
     def confirm_watcher(self, function_name: str):
         """Report successful watch request back to server."""
         requests.post(
-            f"{self.base_server_url}/confirm-watcher",
+            f"{self.base_server_url}/events",
             json={
+                "event_name": "confirm-watcher",
                 "function_name": function_name,
-                "status": "success",
             },
         )
 
     def log_function_call(self, function_name: str, args: list, kwargs: dict):
         """Report function call back to server."""
         requests.post(
-            f"{self.base_server_url}/log-function-call",
+            f"{self.base_server_url}/events",
             json={
+                "event_name": "log-function-call",
                 "function_name": function_name,
                 "args": args,
                 "kwargs": kwargs,
@@ -82,16 +83,16 @@ class Manager:
             time.sleep(self.poll_interval)
 
     def check_connection(self) -> bool:
-        connection_url = f"{self.base_server_url}/add-process"
+        events_url = f"{self.base_server_url}/events"
         system_info = get_system_identifier()
-        payload = {"system_info": SystemInfoSerializer.to_dict(system_info)}
+        payload = {"event_name": "add-process", "system_info": SystemInfoSerializer.to_dict(system_info)}
         try:
-            response = requests.post(connection_url, json=payload)
+            response = requests.post(events_url, json=payload)
             response.raise_for_status()
-            message = f"Successfully connected to prodwatch server at {connection_url}"
+            message = f"Successfully connected to prodwatch server at {events_url}"
             self.logger.info(message)
             return True
         except RequestException:
-            message = f"Failed to connect to prodwatch server at {connection_url}"
+            message = f"Failed to connect to prodwatch server at {events_url}"
             self.logger.error(message)
             return False

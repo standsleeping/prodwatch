@@ -72,10 +72,10 @@ class TestManagerWatchRequests:
         manager.confirm_watcher("test_function")
 
         mock_post.assert_called_once_with(
-            "http://test-server.com/confirm-watcher",
+            "http://test-server.com/events",
             json={
+                "event_name": "confirm-watcher",
                 "function_name": "test_function",
-                "status": "success",
             },
         )
 
