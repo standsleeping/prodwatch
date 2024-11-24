@@ -93,7 +93,7 @@ def test_missing_event_name(client):
     assert response.json()["error"] == "Missing event_name"
 
 def test_response_stream(client):
-    response = client.get("/watcher-stream?watcher_id=test_watcher&max_events=5")
+    response = client.get("/watcher-stream?function_name=test_watcher&max_events=5")
     chunks = []
     for chunk in response.iter_text(chunk_size=1024):
         chunks.append(chunk)
@@ -105,7 +105,7 @@ def test_response_stream(client):
 async def test_watcher_stream_async():
     async with httpx.AsyncClient(app=server, base_url="http://test") as client:
         response = await client.get(
-            "/watcher-stream?watcher_id=test_watcher&max_events=5"
+            "/watcher-stream?function_name=test_watcher&max_events=5"
         )
         chunks = []
         async for chunk in response.aiter_text():

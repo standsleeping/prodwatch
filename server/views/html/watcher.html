@@ -1,7 +1,7 @@
 <div
     id="response-area"
     hx-ext="sse"
-    sse-connect="/watcher-stream?watcher_id=${watcher_id}"
+    sse-connect="/watcher-stream?function_name=${function_name}"
     sse-swap="SomeEventName"
     sse-close="StreamClosing"
 >

@@ -81,18 +81,18 @@ async def pending_function_names(request: Request):
 
 @server.route("/watcher-stream", methods=["GET"])
 async def watcher_stream(request: Request):
-    watcher_id = request.query_params.get("watcher_id", "unknown")
+    function_name = request.query_params.get("function_name", "unknown")
     max_events = int(request.query_params.get("max_events", 10))
 
     return StreamingResponse(
-        event_stream(watcher_id, max_events), media_type="text/event-stream"
+        event_stream(function_name, max_events), media_type="text/event-stream"
     )
 
 
-async def event_stream(watcher_id: str, max_events: int):
+async def event_stream(function_name: str, max_events: int):
     event_count = 0
     while True:
-        data = f"event: SomeEventName\ndata: <div style='font-family: monospace;'>{watcher_id}: ({uuid.uuid4()})</div>\n\n"
+        data = f"event: SomeEventName\ndata: <div style='font-family: monospace;'>{function_name}: ({uuid.uuid4()})</div>\n\n"
         yield data
         await asyncio.sleep(0.5)
         event_count += 1
@@ -105,8 +105,7 @@ async def add_watcher(request: Request):
     form_data = await request.form()
     function_name = str(form_data.get("function_name"))
     app.add_watcher(function_name)
-    watcher_id = "1234"
-    return render_page("Watcher", watcher(watcher_id))
+    return render_page("Watcher", watcher(function_name))
 
 
 @server.route("/events", methods=["POST"])
