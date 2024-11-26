@@ -62,4 +62,4 @@ class ProdwatchApp:
         for watcher in self.watchers:
             if watcher.function_name == function_name:
                 watcher.calls.append(data)
-                self.function_queues[function_name].put_nowait(data)
+                self.function_queues[function_name].put_nowait(function_name)

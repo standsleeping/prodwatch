@@ -94,9 +94,11 @@ async def event_stream(function_name: str, max_events: int):
     queue = app.function_queues[function_name]
 
     while True:
-        data = await queue.get()
+        function_name = await queue.get()
 
-        html = function_calls(function_name, [data])
+        calls = app.get_function_calls(function_name)
+
+        html = function_calls(function_name, calls)
         if html:
             data = f"event: SomeEventName\ndata: {html}\n\n"
             yield data
