@@ -1,6 +1,4 @@
 import uvicorn
-import asyncio
-import uuid
 from typing import TypeVar, Callable, Any, TypeAlias, Awaitable
 from pydantic import BaseModel, Field, ValidationError
 from starlette.applications import Starlette
@@ -11,6 +9,8 @@ from .views.render_html import render_html
 from .views.process_list import process_list
 from .views.add_watcher_form import add_watcher_form
 from .views.watcher import watcher
+from .views.function_calls import function_calls
+
 
 class ProcessInfo(BaseModel):
     instance_id: str
@@ -82,7 +82,7 @@ async def pending_function_names(request: Request):
 @server.route("/watcher-stream", methods=["GET"])
 async def watcher_stream(request: Request):
     function_name = request.query_params.get("function_name", "unknown")
-    max_events = int(request.query_params.get("max_events", 10))
+    max_events = int(request.query_params.get("max_events", 1000))
 
     return StreamingResponse(
         event_stream(function_name, max_events), media_type="text/event-stream"
@@ -91,14 +91,21 @@ async def watcher_stream(request: Request):
 
 async def event_stream(function_name: str, max_events: int):
     event_count = 0
+    queue = app.function_queues[function_name]
+
     while True:
-        data = f"event: SomeEventName\ndata: <div style='font-family: monospace;'>{function_name}: ({uuid.uuid4()})</div>\n\n"
-        yield data
-        await asyncio.sleep(0.5)
+        data = await queue.get()
+
+        html = function_calls(function_name, [data])
+        if html:
+            data = f"event: SomeEventName\ndata: {html}\n\n"
+            yield data
+
         event_count += 1
         if max_events and event_count >= max_events:
             yield "event: StreamClosing\ndata: N/A\n\n"
             break
+
 
 @server.route("/add-watcher", methods=["POST"])
 async def add_watcher(request: Request):

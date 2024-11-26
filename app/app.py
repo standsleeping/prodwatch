@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from asyncio import Queue
+from collections import defaultdict
 
 
 class WatcherStatus(Enum):
@@ -26,6 +28,7 @@ class ProdwatchApp:
     def __init__(self) -> None:
         self.watchers: list[Watcher] = []
         self.processes: list[Process] = []
+        self.function_queues: dict[str, Queue] = defaultdict(Queue)
 
     def add_process(self, instance_id: str) -> None:
         self.processes.append(Process(instance_id, datetime.now()))
@@ -35,6 +38,12 @@ class ProdwatchApp:
 
     def add_watcher(self, function_name: str) -> None:
         self.watchers.append(Watcher(function_name, WatcherStatus.PENDING, []))
+
+    def get_function_calls(self, function_name: str) -> list[dict]:
+        for watcher in self.watchers:
+            if watcher.function_name == function_name:
+                return watcher.calls
+        return []
 
     def confirm_watcher(self, function_name: str) -> None:
         for watcher in self.watchers:
@@ -53,3 +62,4 @@ class ProdwatchApp:
         for watcher in self.watchers:
             if watcher.function_name == function_name:
                 watcher.calls.append(data)
+                self.function_queues[function_name].put_nowait(data)
