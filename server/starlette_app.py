@@ -28,7 +28,7 @@ class ConfirmWatcherEvent(BaseModel):
     function_name: str
 
 
-class LogFunctionCall(BaseModel):
+class LogFunctionCallEvent(BaseModel):
     function_name: str
     args: list = Field(default_factory=list)
     kwargs: dict = Field(default_factory=dict)
@@ -151,7 +151,7 @@ async def events(request: Request):
 
     elif event_name == "log-function-call":
         log_function_call_request_data, error_data = await validate_request_model(
-            request, LogFunctionCall
+            request, LogFunctionCallEvent
         )
         if error_data is not None:
             return JSONResponse(error_data, status_code=400)
