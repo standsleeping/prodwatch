@@ -53,7 +53,7 @@ class Manager:
             },
         )
 
-    def log_function_call(self, function_name: str, args: list, kwargs: dict):
+    def log_function_call(self, function_name: str, args: list, kwargs: dict, execution_time_ms: float):
         """Report function call back to server."""
         requests.post(
             f"{self.base_server_url}/events",
@@ -62,6 +62,7 @@ class Manager:
                 "function_name": function_name,
                 "args": args,
                 "kwargs": kwargs,
+                "execution_time_ms": execution_time_ms,
             },
         )
 

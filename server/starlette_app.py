@@ -32,6 +32,7 @@ class LogFunctionCallEvent(BaseModel):
     function_name: str
     args: list = Field(default_factory=list)
     kwargs: dict = Field(default_factory=dict)
+    execution_time_ms: float
 
 
 T = TypeVar("T", bound=BaseModel)

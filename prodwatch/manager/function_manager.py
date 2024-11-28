@@ -1,4 +1,5 @@
 import sys
+import time
 
 
 def find_function(function_name):
@@ -25,10 +26,21 @@ class FunctionManager:
             return False
 
         def logged_function(*args, **kwargs):
+            start_time = time.perf_counter()
             result = original_function(*args, **kwargs)
+            end_time = time.perf_counter()
+            diff = end_time - start_time
+            execution_time_ms = diff * 1000  # Convert to milliseconds
+
             try:
-                self.log_function_call(function_name, args, kwargs)
-                write_string = f"Function {module.__name__}.{function_name} called with args: {args}, kwargs: {kwargs}, result: {result}\n"
+                self.log_function_call(
+                    function_name, args, kwargs, execution_time_ms=execution_time_ms
+                )
+                write_string = (
+                    f"Function {module.__name__}.{function_name} called with "
+                    f"args: {args}, kwargs: {kwargs}, result: {result}, "
+                    f"execution time: {execution_time_ms:.2f}ms\n"
+                )
                 print(write_string)
             except Exception as e:
                 print(f"Error writing to log file: {e}")

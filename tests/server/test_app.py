@@ -63,7 +63,11 @@ def test_confirm_watcher_missing_function_name(client):
 
 
 def test_function_call_valid(client):
-    data = {"event_name": "log-function-call", "function_name": "test_function"}
+    data = {
+        "event_name": "log-function-call",
+        "function_name": "test_function",
+        "execution_time_ms": 100,
+    }
     response = client.post("/events", json=data)
     assert response.status_code == 200
 

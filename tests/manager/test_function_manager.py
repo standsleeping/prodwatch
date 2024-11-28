@@ -15,9 +15,14 @@ class TestFunctionWatcher:
     def mock_logger(self):
         calls = []
 
-        def log_function_call(function_name, args, kwargs):
+        def log_function_call(function_name, args, kwargs, execution_time_ms):
             calls.append(
-                {"function_name": function_name, "args": args, "kwargs": kwargs}
+                {
+                    "function_name": function_name,
+                    "args": args,
+                    "kwargs": kwargs,
+                    "execution_time_ms": execution_time_ms,
+                }
             )
 
         return log_function_call, calls
