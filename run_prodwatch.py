@@ -4,6 +4,7 @@ from prodwatch import start_prodwatch
 
 
 def calculate_sum(a, b):
+    time.sleep(random.uniform(0.05, 0.1))
     result = int(a) + int(b)
     print(f"{a} + {b} = {result}")
     return result
@@ -17,4 +18,4 @@ if __name__ == "__main__":
         b = random.randint(0, 100)
         print(f"Calling calculate_sum with {a} and {b}")
         calculate_sum(a, b)
-        time.sleep(5)
+        time.sleep(2)
