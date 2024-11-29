@@ -1,20 +1,34 @@
-FROM ubuntu:22.04
+FROM python:3.13-slim-bookworm
 
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    procps \
-    && rm -rf /var/lib/apt/lists/*
-
+# Set working directory
 WORKDIR /app
 
-# Create log file for demonstrating the logging functionality
-RUN touch /app/log_file.txt && \
-    chmod 666 /app/log_file.txt
+# Install uv 0.5.5
+COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
 
-COPY run_prodwatch.py watch_function.py ./
-COPY prodwatch ./prodwatch
+# Copy the /server package
+COPY server ./server
 
-ENV PYTHONUNBUFFERED=1
+# Copy the /app package
+COPY app ./app
 
-CMD ["python3", "run_prodwatch.py"]
+# Create a virtual environment
+RUN uv venv /opt/venv
+
+# Use the virtual environment automatically
+ENV VIRTUAL_ENV=/opt/venv
+
+# Place entry points in the environment at the front of the path
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy the pyproject.toml file
+COPY pyproject.toml .
+
+# Install dependencies
+RUN uv pip install -r pyproject.toml
+
+# Expose port 8000
+EXPOSE 8000
+
+# Run the Starlette application
+CMD ["uvicorn", "server.starlette_app:server", "--host", "0.0.0.0", "--port", "8000"] 
