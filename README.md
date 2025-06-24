@@ -1,6 +1,6 @@
 # ProdWatch
 
-Add logging to your code on the fly, directly from your editor. No deploy required!
+A faster, safer way to log and debug live code.
 
 ## Installation & Setup
 
