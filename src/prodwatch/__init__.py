@@ -7,7 +7,7 @@ DEFAULT_BASE_SERVER_URL = "https://getprodwatch.com"
 DEFAULT_LOG_LEVEL = "INFO"
 
 
-def start_prodwatch() -> None:
+def start_prodwatch(app_name: str) -> None:
     logger = None
     try:
         log_level = os.getenv("PRODWATCH_LOG_LEVEL", DEFAULT_LOG_LEVEL)
@@ -18,7 +18,7 @@ def start_prodwatch() -> None:
 
         base_server_url = os.getenv("PRODWATCH_API_URL", DEFAULT_BASE_SERVER_URL)
 
-        manager = Manager(base_server_url)
+        manager = Manager(base_server_url, app_name=app_name)
 
         if not manager.check_connection():
             return

@@ -1,6 +1,6 @@
 [project]
 name = "prodwatch"
-version = "0.1.0"
+version = "0.2.0"
 description = "A faster, safer way to log and debug live code."
 authors = [
     { name = "Ryan Prinz", email = "standsleeping@gmail.com" },

@@ -16,12 +16,13 @@ from .system_identification import (
 
 
 class Manager:
-    def __init__(self, base_server_url: str, poll_interval: int = 5):
+    def __init__(self, base_server_url: str, app_name: str, poll_interval: int = 5):
         self.base_server_url = base_server_url
         self.poll_interval = poll_interval
         self.active = False
         self.polling_thread: Optional[threading.Thread] = None
         self.process_id: uuid.UUID = uuid.uuid4()
+        self.app_name = app_name
         self.logger = logging.getLogger(__name__)
 
         self.token = os.getenv("PRODWATCH_API_TOKEN")
@@ -58,8 +59,15 @@ class Manager:
 
     def get_pending_function_names(self) -> List[str]:
         """Get list of pending function watch requests from server."""
-        full_url = f"{self.base_server_url}/pending-function-names?process_id={str(self.process_id)}"
-        response = self.session.get(full_url, allow_redirects=False)
+        params = {
+            "process_id": str(self.process_id),
+            "app_name": self.app_name
+        }
+        response = self.session.get(
+            f"{self.base_server_url}/pending-function-names", 
+            params=params, 
+            allow_redirects=False
+        )
         if response.status_code != 200:
             self.handle_error(response, "pending-function-names")
             return []
@@ -74,6 +82,7 @@ class Manager:
             "event_name": "confirm-watcher",
             "function_name": function_name,
             "process_id": str(self.process_id),
+            "app_name": self.app_name,
         }
 
         if finder_result:
@@ -100,6 +109,8 @@ class Manager:
         data = {
             "event_name": "log-function-call",
             "function_name": function_name,
+            "process_id": str(self.process_id),
+            "app_name": self.app_name,
             "args": args,
             "kwargs": kwargs,
             "execution_time_ms": execution_time_ms,
@@ -146,6 +157,7 @@ class Manager:
         payload = {
             "event_name": "add-process",
             "process_id": str(self.process_id),
+            "app_name": self.app_name,
             "system_info": SystemInfoSerializer.to_dict(system_info),
         }
         try:
@@ -169,6 +181,7 @@ class Manager:
             "event_name": "failed-watcher",
             "function_name": function_name,
             "process_id": str(self.process_id),
+            "app_name": self.app_name,
         }
 
         if finder_result:

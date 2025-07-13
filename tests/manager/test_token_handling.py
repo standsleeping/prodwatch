@@ -12,7 +12,7 @@ class TestTokenHandling:
             del os.environ["PRODWATCH_API_TOKEN"]
 
         with pytest.raises(TokenError) as exc_info:
-            Manager("http://test-server.com")
+            Manager("http://test-server.com", app_name="test-app")
 
         error_message = "PRODWATCH_API_TOKEN environment variable is required"
         assert error_message in str(exc_info.value)
@@ -22,7 +22,7 @@ class TestTokenHandling:
         os.environ["PRODWATCH_API_TOKEN"] = ""
 
         with pytest.raises(TokenError) as exc_info:
-            Manager("http://test-server.com")
+            Manager("http://test-server.com", app_name="test-app")
 
         assert "PRODWATCH_API_TOKEN environment variable is required" in str(
             exc_info.value
@@ -33,7 +33,7 @@ class TestTokenHandling:
         test_token = "test-token-123"
         os.environ["PRODWATCH_API_TOKEN"] = test_token
 
-        manager = Manager("http://test-server.com")
+        manager = Manager("http://test-server.com", app_name="test-app")
 
         assert manager.token == test_token
         assert manager.session.headers["Authorization"] == f"Bearer {test_token}"
@@ -44,7 +44,7 @@ class TestTokenHandling:
         test_token = "test-token-123"
         os.environ["PRODWATCH_API_TOKEN"] = test_token
 
-        manager = Manager("http://test-server.com")
+        manager = Manager("http://test-server.com", app_name="test-app")
         manager.confirm_watcher("test_function")
 
         # Verify the request was made
@@ -58,7 +58,7 @@ class TestTokenHandling:
         test_token = "test-token-123"
         os.environ["PRODWATCH_API_TOKEN"] = test_token
 
-        manager = Manager("http://test-server.com")
+        manager = Manager("http://test-server.com", app_name="test-app")
         manager.get_pending_function_names()
 
         # Verify the request was made

@@ -16,7 +16,7 @@ from prodwatch.manager.system_identification import (
 def manager():
     test_token = "test-token-123"
     os.environ["PRODWATCH_API_TOKEN"] = test_token
-    return Manager("http://test-server.com", poll_interval=1)
+    return Manager("http://test-server.com", poll_interval=1, app_name="test-app")
 
 
 @pytest.fixture

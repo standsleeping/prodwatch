@@ -43,9 +43,9 @@ class TestManagerWatchRequests:
 
         assert result == ["func1", "func2"]
 
-        full_url = f"{manager.base_server_url}/pending-function-names?process_id={manager.process_id}"
         mock_get.assert_called_once_with(
-            full_url,
+            f"{manager.base_server_url}/pending-function-names",
+            params={"process_id": str(manager.process_id), "app_name": "test-app"},
             allow_redirects=False,
         )
 
@@ -145,9 +145,9 @@ class TestManagerWatchRequests:
 
         assert result == []
 
-        full_url = f"{manager.base_server_url}/pending-function-names?process_id={manager.process_id}"
         mock_get.assert_called_once_with(
-            full_url,
+            f"{manager.base_server_url}/pending-function-names",
+            params={"process_id": str(manager.process_id), "app_name": "test-app"},
             allow_redirects=False,
         )
 
@@ -162,6 +162,7 @@ class TestManagerWatchRequests:
                 "event_name": "confirm-watcher",
                 "function_name": "test_function",
                 "process_id": str(manager.process_id),
+                "app_name": "test-app",
             },
             allow_redirects=False,
         )
@@ -220,6 +221,7 @@ class TestManagerWatchRequests:
                     "event_name": "failed-watcher",
                     "function_name": "test_function",
                     "process_id": str(manager.process_id),
+                    "app_name": "test-app",
                 },
                 allow_redirects=False,
             )
