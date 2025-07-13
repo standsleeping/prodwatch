@@ -1,12 +1,12 @@
 [project]
 name = "prodwatch"
-version = "0.2.0"
+version = "0.3.0"
 description = "A faster, safer way to log and debug live code."
 authors = [
     { name = "Ryan Prinz", email = "standsleeping@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "requests>=2.32.4",
 ]
@@ -23,6 +23,7 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
 
 [project.urls]
 Homepage = "https://getprodwatch.com"
